@@ -5,8 +5,11 @@ import ApiError from '../utils/ApiError.js'
 const router = Router()
 
 router.get('/build-status', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
   try {
-    const response = await fetch('https://api.github.com/repos/YoussefMohamed-Joo/healthy-bite-app/releases/latest')
+    const response = await fetch('https://api.github.com/repos/YoussefMohamed-Joo/healthy-bite-app/releases/latest', {
+      headers: { 'Accept': 'application/vnd.github+json' },
+    })
     if (!response.ok) return res.json({ status: 'success', android: false, ios: false })
     const data = await response.json()
     const hasApk = data.assets?.some(a => a.name === 'HealthyBite-Android.apk')
@@ -17,8 +20,13 @@ router.get('/build-status', async (req, res) => {
 })
 
 router.get('/version', async (_req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+  res.setHeader('Pragma', 'no-cache')
+  res.setHeader('Expires', '0')
   try {
-    const response = await fetch('https://api.github.com/repos/YoussefMohamed-Joo/healthy-bite-app/releases/latest')
+    const response = await fetch('https://api.github.com/repos/YoussefMohamed-Joo/healthy-bite-app/releases/latest', {
+      headers: { 'Accept': 'application/vnd.github+json' },
+    })
     if (!response.ok) return res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false } })
     const data = await response.json()
     const version = data.tag_name?.replace('v', '') || '1.0.0'
