@@ -12,7 +12,7 @@ export default function Menu() {
   const { addItem } = useCart()
 
   useEffect(() => {
-    fetch(`${API}/products`).then(r => r.json()).then(setProducts).catch(console.error)
+    fetch(`${API}/products`).then(r => r.json()).then(d => setProducts(d.data || [])).catch(console.error)
   }, [])
 
   const filtered = products.filter(p =>
@@ -37,13 +37,13 @@ export default function Menu() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex flex-wrap justify-center gap-5">
           {filtered.map((product, i) => (
             <motion.div
               key={product._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0, transition: { delay: i * 0.05 } }}
-              className="bg-white rounded-2xl border border-zinc-100 overflow-hidden hover:shadow-lg transition-shadow"
+              className="w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(25%-0.9375rem)] min-w-[250px] bg-white rounded-2xl border border-zinc-100 overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className="h-52 overflow-hidden">
                 <img src={product.image ? API + product.image : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80'} alt={product.nameAr} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
@@ -57,7 +57,7 @@ export default function Menu() {
                 </div>
                 <p className="text-zinc-500 text-sm mb-4">{product.descriptionAr || 'وجبة صحية ولذيذة'}</p>
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-lg text-zinc-900">{product.price} $</span>
+                  <span className="font-bold text-lg text-zinc-900">{product.price} ج.م</span>
                   <Button size="sm" variant="default" onClick={() => addItem(product)} className="gap-1.5">
                     <Plus className="w-4 h-4" />
                     أضف

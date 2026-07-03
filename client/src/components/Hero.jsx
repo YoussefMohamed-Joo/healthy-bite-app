@@ -1,116 +1,99 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Leaf, Calculator, Truck, BadgePercent } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.25, 0.46, 0.45, 0.94] } },
-})
+const features = [
+  { icon: Leaf, label: 'مكونات طبيعية' },
+  { icon: Calculator, label: 'سعرات محسوبة' },
+  { icon: Truck, label: 'توصيل سريع' },
+  { icon: BadgePercent, label: 'أسعار مناسبة' },
+]
 
 export default function Hero() {
   return (
-    <section className="relative w-full h-[90vh] overflow-hidden bg-zinc-950">
-      {/* Image — RIGHT SIDE ONLY */}
-      <img
-        src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1600&q=85"
-        alt="Healthy food"
-        className="absolute right-0 top-0 w-[60%] h-full object-cover"
-      />
-
-      {/* Gradient Overlay — LEFT AREA ONLY */}
-      <div
-        className="absolute left-0 top-0 w-[50%] h-full pointer-events-none"
-        style={{
-          background: 'linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)',
-        }}
-      />
-
-      {/* Content Container */}
-      <div className="relative z-[2] w-[40%] h-full p-20 flex flex-col justify-center">
-        {/* Badge */}
-        <motion.div {...fadeUp(0)} className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-5 py-2 text-sm text-white/90 mb-7 w-fit">
-          <span>🥗</span>
-          <span>توصيل مجاني • ٧ أيام</span>
-        </motion.div>
-
-        {/* Title */}
-        <motion.h1
-          {...fadeUp(0.1)}
-          className="font-cairo text-5xl md:text-6xl font-bold text-white leading-[1.2] mb-5"
-        >
-          أكل صحي<br />
-          يوصل لباب <span className="text-brand">بيتك</span>
-        </motion.h1>
-
-        {/* Subtitle */}
-        <motion.p
-          {...fadeUp(0.2)}
-          className="text-[#e5e7eb] text-lg max-w-[500px] mb-8 leading-relaxed"
-        >
-          وجبات محسوبة، طعم جامد، ونتايج هتحس بيها من أول أسبوع
-        </motion.p>
-
-        {/* Buttons */}
-        <motion.div {...fadeUp(0.3)} className="flex gap-4">
-          <Button variant="default" size="lg" className="rounded-xl px-7 py-3.5 text-base">
-            اطلب دلوقتي
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <button className="border-2 border-white text-white bg-transparent rounded-xl px-7 py-3.5 text-base font-bold transition-all duration-200 hover:bg-white/10 hover:scale-[1.03] cursor-pointer">
-            شوف المينيو
-          </button>
-        </motion.div>
-
-        {/* Metrics */}
-        <motion.div {...fadeUp(0.4)} className="flex items-center gap-7 mt-12">
-          <div className="flex items-center gap-3">
-            <span className="text-lg">⭐</span>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-white leading-tight">٤٫٩</span>
-              <span className="text-[11px] text-white/45 font-medium">تقييم</span>
+    <section className="min-h-screen bg-white pt-[72px] overflow-hidden">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[calc(100vh-72px)]">
+          {/* Text content */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="order-2 md:order-1"
+          >
+            <div className="inline-flex items-center gap-2 bg-primary-light text-primary text-sm font-bold px-4 py-2 rounded-full mb-6">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              توصيل مجاني لأول طلب
             </div>
-          </div>
-          <div className="w-px h-7 bg-white/10" />
-          <div className="flex items-center gap-3">
-            <span className="text-lg">🔥</span>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-white leading-tight">٣٥٠-٥٠٠</span>
-              <span className="text-[11px] text-white/45 font-medium">سعرة</span>
-            </div>
-          </div>
-          <div className="w-px h-7 bg-white/10" />
-          <div className="flex items-center gap-3">
-            <span className="text-lg">✅</span>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-white leading-tight">٥٠,٠٠٠+</span>
-              <span className="text-[11px] text-white/45 font-medium">عميل</span>
-            </div>
-          </div>
-        </motion.div>
-      </div>
 
-      {/* Features Bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } }}
-        className="absolute bottom-0 left-0 right-0 z-10 bg-black/40 backdrop-blur-md border-t border-white/5 py-4"
-      >
-        <div className="max-w-[1320px] mx-auto px-10">
-          <div className="flex justify-center gap-12 flex-wrap">
-            {[
-              { icon: '🥑', label: 'مكونات طبيعية' },
-              { icon: '📊', label: 'سعرات محسوبة' },
-              { icon: '🚚', label: 'توصيل سريع' },
-              { icon: '💪', label: 'مناسب للجيم' },
-            ].map((f) => (
-              <span key={f.label} className="flex items-center gap-2 text-sm font-medium text-white/75 hover:text-brand transition-colors">
-                <span className="text-lg">{f.icon}</span>
-                {f.label}
-              </span>
-            ))}
-          </div>
+            <h1 className="font-cairo text-[2.5rem] md:text-[3.5rem] leading-[1.15] font-extrabold text-charcoal mb-4">
+              أكل صحي
+              <br />
+              <span className="text-primary">يوصل لباب بيتك</span>
+            </h1>
+
+            <p className="text-grey text-base md:text-lg leading-relaxed mb-8 max-w-lg">
+              وجبات صحية محضرة بعناية، سعراتها محسوبة، وطعمها لا يُقاوم. نوصلها لك في أسرع وقت.
+            </p>
+
+            <div className="flex items-center gap-4 flex-wrap mb-12">
+              <Link to="/menu">
+                <Button size="lg" className="text-base px-9 shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/40">
+                  اطلب الآن
+                </Button>
+              </Link>
+              <Link to="/menu">
+                <Button variant="outline" size="lg" className="text-base border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-white hover:scale-105 px-9">
+                  استعرض القائمة
+                </Button>
+              </Link>
+            </div>
+
+            {/* Features row */}
+            <div className="flex flex-wrap gap-6">
+              {features.map((f, i) => {
+                const Icon = f.icon
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0, transition: { delay: 0.4 + i * 0.1 } }}
+                    className="flex items-center gap-2.5"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-semibold text-charcoal">{f.label}</span>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </motion.div>
+
+          {/* Image */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
+            className="order-1 md:order-2 flex items-center justify-center py-10"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl scale-125" />
+              <div className="w-[340px] h-[340px] md:w-[420px] md:h-[420px] lg:w-[480px] lg:h-[480px] rounded-full border-4 border-primary/10 overflow-hidden shadow-2xl shadow-primary/20">
+                <img
+                  src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=85"
+                  alt="Healthy meal"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Decorative dots */}
+              <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/10 rounded-full" />
+              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-accent/10 rounded-full" />
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
+      </div>
     </section>
   )
 }

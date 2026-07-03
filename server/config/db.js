@@ -2,15 +2,22 @@ import mongoose from 'mongoose'
 import config from './index.js'
 import logger from '../utils/logger.js'
 
-export default async function connectDB() {
-  try {
-    const conn = await mongoose.connect(config.mongoUri)
-    logger.info(`MongoDB connected: ${conn.connection.host}`)
-  } catch (err) {
-    logger.error(`MongoDB connection error: ${err.message}`)
-    process.exit(1)
-  }
+let cached = global.mongoose
+if (!cached) cached = global.mongoose = { conn: null, promise: null }
 
-  mongoose.connection.on('error', (err) => logger.error(`MongoDB error: ${err.message}`))
-  mongoose.connection.on('disconnected', () => logger.warn('MongoDB disconnected'))
+export default async function connectDB() {
+  if (cached.conn) return cached.conn
+  if (cached.promise) return cached.promise
+
+  cached.promise = mongoose.connect(config.mongoUri).then(conn => {
+    logger.info(`MongoDB connected: ${conn.connection.host}`)
+    cached.conn = conn
+    return conn
+  }).catch(err => {
+    logger.error(`MongoDB error: ${err.message}`)
+    cached.promise = null
+    return null
+  })
+
+  return cached.promise
 }

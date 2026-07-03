@@ -1,33 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Search } from 'lucide-react'
+import { ChevronDown, Search, Loader2 } from 'lucide-react'
 
-const faqs = [
-  { q: 'متى سأستلم توصيل الوجبات الصحية؟', a: 'نوصل الطلبات من ٨ صباحاً لـ ١١ مساءً.可以选择 وقت التوصيل المناسب ليك — هتوصلك خلال ٣٠-٤٥ دقيقة من وقت الطلب.' },
-  { q: 'هل يمكنني اختيار وقت توصيل الطعام الصحي؟', a: 'أكيد. تقدر تحدد وقت التوصيل اللي يناسبك أثناء الطلب — هنوصلك في المعاد اللي تختاره بالضبط.' },
-  { q: 'ما مدى طزاجة الوجبات الصحية اللي توصلوها؟', a: 'بنحضر الوجبات يومياً من مطبخنا المركزي باستخدام مكونات طازجة بنفس اليوم. مفيش تخزين ولا وجبات مجمدة.' },
-  { q: 'ما اللي يميز طعامكم الصحي عن الخدمات التانية؟', a: 'الفرق إن كل وجبة معمولة تحت إشراف أخصائي تغذية، السعرات محسوبة بدقة، والتوصيل مجاني. وطعمها جامد برضه 😉' },
-  { q: 'هل توصلون الطعام الصحي إلى القاهرة الجديدة والتجمع الخامس؟', a: 'بنوصل لكل مناطق القاهرة الكبرى، التجمع، القاهرة الجديدة، الشيخ زايد، ٦ أكتوبر، والمعادي. بنوّع نطاق التوصيل باستمرار.' },
-  { q: 'أين أجد مطاعم صحية في القاهرة الجديدة تقدم خدمة التوصيل؟', a: 'HealthyBite مش مطعم تقليدي — احنا خدمة تحضير وتوصيل وجبات صحية. بنوصل لكل القاهرة الجديدة والتجمع، من غير ما تضطر تطلب من مطاعم متفرقة.' },
-  { q: 'ما هو الميل بريب وكيف يعمل؟', a: 'الميل بريب (Meal Prep) هو نظام تحضير الوجبات مسبقاً. احنا بنحضر الوجبات freshly لكل يوم، بتختار الوجبات اللي تعجبك، واحنا بنوصلها لباب بيتك.' },
-  { q: 'إيه الفرق بين HealthyBite وخدمات الدايت التانية؟', a: 'HealthyBite مش بس وجبات دايت — احنا نقدم وجبات متكاملة بطعم جامد، سعرات محسوبة، مكونات طبيعية ١٠٠٪. وبنوصل لكل مكان.' },
-  { q: 'إزاي أقدر أكل صحي في مصر مع جدول مشغول؟', a: 'سهل — اطلب من HealthyBite. هتختار الوجبات من المينيو واحنا هنوصلها لك مكتبك أو بيتك. توفير وقت، مجهود، وضمان أكلك صحي.' },
-  { q: 'ما خيارات الطعام الصحي اللي تقدمونها للغداء؟', a: 'عندنا باور بول، بروتين بليت، جرين جوديس، سلطة سيزر، فلافل بول، توست أفوكادو، ومانجو بول. كلها طازة ومحضرة بنفس اليوم.' },
-  { q: 'ما هي سياسة الإلغاء لتوصيل الوجبات الصحية؟', a: 'تقدر تلغي الطلب مجاناً خلال ١٥ دقيقة من الطلب. بعد كده بنكون بدأنا التحضير، فمينفعش الإلغاء.' },
-  { q: 'هل تراعون القيود الغذائية والحساسية؟', a: 'طبعاً 👌 بنكتب مكونات كل وجبة بالتفصيل، وتقدر تطلب تعديلات أو تستشير أخصائي التغذية بتاعنا قبل الطلب.' },
-  { q: 'كم تكلفة توصيل الوجبات الصحية؟', a: 'التوصيل مجاني للطلبات فوق ١٠٠ جنيه. للطلبات الأقل، التوصيل ٢٠ جنيه فقط.' },
-  { q: 'ليه أختار HealthyBite لتوصيل الطعام الصحي؟', a: 'وجبات طازة يومياً، سعرات محسوبة بدقة، مكونات طبيعية، توصيل مجاني وسريع، وطعم جامد مش هتحس إنك على دايت.' },
-  { q: 'ما المناطق اللي بتغطوها لتوصيل الوجبات الصحية؟', a: 'القاهرة، الجيزة، القاهرة الجديدة، التجمع، الشيخ زايد، ٦ أكتوبر، المعادي، مدينة نصر، مصر الجديدة، وبني سويف.' },
-  { q: 'هل يمكنني طلب وجبات صحية لمكتبي في القاهرة؟', a: 'أكيد — بنوصل لمكاتب وشركات في كل مناطق القاهرة. تقدر تعمل طلب منتظم لمكتبك كل يوم.' },
-  { q: 'تغطية التوصيل', a: 'نوصل الوجبات الطازجة في جميع أنحاء القاهرة الكبرى، الجيزة، القاهرة الجديدة، التجمع الخامس، الشيخ زايد، ٦ أكتوبر، المعادي، مدينة نصر، مصر الجديدة، وبني سويف. بنوسع التغطية باستمرار.' },
-]
+const API = import.meta.env.VITE_API_URL || ''
 
 export default function FAQ() {
+  const [faqs, setFaqs] = useState([])
+  const [loading, setLoading] = useState(true)
   const [openIndex, setOpenIndex] = useState(null)
   const [search, setSearch] = useState('')
 
+  useEffect(() => {
+    fetch(`${API}/faq`)
+      .then(r => r.json())
+      .then(d => { setFaqs(d.data || []); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
+
   const filtered = faqs.filter(f =>
-    f.q.includes(search) || f.a.includes(search)
+    f.question.includes(search) || f.answer.includes(search)
+  )
+
+  if (loading) return (
+    <section className="min-h-screen bg-zinc-50 pt-[70px] flex items-center justify-center">
+      <Loader2 className="w-8 h-8 text-brand animate-spin" />
+    </section>
   )
 
   return (
@@ -50,7 +47,7 @@ export default function FAQ() {
         <div className="space-y-3">
           {filtered.map((faq, i) => (
             <motion.div
-              key={i}
+              key={faq._id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0, transition: { delay: i * 0.02 } }}
               className="bg-white rounded-2xl border border-zinc-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
@@ -60,7 +57,7 @@ export default function FAQ() {
                 className="w-full flex items-center justify-between p-5 text-right cursor-pointer"
               >
                 <span className="font-cairo font-bold text-zinc-900 text-sm md:text-base leading-relaxed ml-4">
-                  {faq.q}
+                  {faq.question}
                 </span>
                 <motion.div
                   animate={{ rotate: openIndex === i ? 180 : 0 }}
@@ -80,7 +77,7 @@ export default function FAQ() {
                     className="overflow-hidden"
                   >
                     <p className="px-5 pb-5 text-zinc-600 text-sm leading-relaxed border-t border-zinc-50 pt-3">
-                      {faq.a}
+                      {faq.answer}
                     </p>
                   </motion.div>
                 )}

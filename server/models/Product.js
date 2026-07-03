@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from '../mongoose.js'
 
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
@@ -11,6 +11,7 @@ const productSchema = new mongoose.Schema({
   descriptionAr: { type: String, default: '' },
   category: { type: String, enum: ['main', 'salad', 'drink', 'snack'], default: 'main' },
   available: { type: Boolean, default: true },
+  featured: { type: Boolean, default: false },
   rating: { type: Number, default: 4.5, min: 0, max: 5 },
 }, { timestamps: true })
 

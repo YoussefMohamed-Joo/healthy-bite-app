@@ -7,9 +7,17 @@ import config from '../config/index.js'
 import fs from 'fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const uploadsDir = path.join(__dirname, '..', 'uploads')
-
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true })
+const uploadsDir = (() => {
+  try {
+    const dir = path.join(__dirname, '..', 'uploads')
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+    return dir
+  } catch {
+    const tmpDir = '/tmp/uploads'
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
+    return tmpDir
+  }
+})()
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
 const MAX_SIZE = 5 * 1024 * 1024
@@ -47,12 +55,13 @@ const upload = multer({
 })
 
 export const uploadSingle = upload.single('image')
+export const uploadReceipt = upload.single('receipt')
 export const uploadNone = upload.none()
 
 export function getImageUrl(file) {
   if (!file) return ''
-  if (file.path) return '/' + file.path.split('server\\').pop().replace(/\\/g, '/')
   if (file.secure_url) return file.secure_url
+  if (file.path) return '/uploads/' + file.filename
   return ''
 }
 

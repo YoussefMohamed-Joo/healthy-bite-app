@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
+import { ChevronDown } from 'lucide-react'
 
 const API = import.meta.env.VITE_API_URL || ''
 
@@ -17,9 +18,18 @@ const statusAr = {
   pending: 'قيد الانتظار',
   confirmed: 'مؤكد',
   preparing: 'قيد التحضير',
-  delivering: 'في التوصيل',
+  delivering: 'خرج للتوصيل',
   delivered: 'تم التوصيل',
   cancelled: 'ملغي',
+}
+
+const validTransitions = {
+  pending: [{ value: 'confirmed', label: 'تأكيد الطلب' }, { value: 'cancelled', label: 'إلغاء' }],
+  confirmed: [{ value: 'preparing', label: 'بدء التحضير' }, { value: 'cancelled', label: 'إلغاء' }],
+  preparing: [{ value: 'delivering', label: 'خرج للتوصيل' }, { value: 'cancelled', label: 'إلغاء' }],
+  delivering: [{ value: 'delivered', label: 'تم التوصيل' }],
+  delivered: [],
+  cancelled: [],
 }
 
 export default function Orders() {
@@ -30,7 +40,7 @@ export default function Orders() {
   const fetchOrders = async () => {
     const res = await fetch(`${API}/orders`, { headers })
     const data = await res.json()
-    setOrders(data)
+    setOrders(data.data || data || [])
   }
 
   useEffect(() => { fetchOrders() }, [])
@@ -44,12 +54,6 @@ export default function Orders() {
     fetchOrders()
   }
 
-  const nextStatus = (current) => {
-    const flow = ['pending', 'confirmed', 'preparing', 'delivering', 'delivered']
-    const idx = flow.indexOf(current)
-    return idx < flow.length - 1 ? flow[idx + 1] : null
-  }
-
   return (
     <div>
       <div className="mb-6">
@@ -61,15 +65,19 @@ export default function Orders() {
         {orders.map(order => (
           <div key={order._id} className="bg-white rounded-2xl border border-zinc-100 p-5">
             <div className="flex items-start justify-between mb-3 flex-wrap gap-2">
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="font-bold text-zinc-900">{order.customerName}</p>
-                <p className="text-zinc-500 text-sm">{order.customerPhone} • {order.customerAddress}</p>
-                <p className="text-zinc-400 text-xs mt-1">{new Date(order.createdAt).toLocaleString('ar-EG')}</p>
+                <p className="text-zinc-500 text-xs">{order.customerPhone}</p>
+                <p className="text-zinc-400 text-xs">{order.customerAddress}</p>
               </div>
-              <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${statusColors[order.status]}`}>
-                {statusAr[order.status]}
-              </span>
+              <div className="text-left">
+                <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${statusColors[order.status]}`}>
+                  {statusAr[order.status]}
+                </span>
+                <p className="text-zinc-400 text-[10px] mt-1">{new Date(order.createdAt).toLocaleString('ar-EG')}</p>
+              </div>
             </div>
+
             <div className="border-t border-zinc-100 pt-3">
               {order.items?.map((item, i) => (
                 <div key={i} className="flex justify-between text-sm py-1">
@@ -82,18 +90,20 @@ export default function Orders() {
                 <span className="text-brand">{order.total?.toFixed(2)} $</span>
               </div>
             </div>
+
             {order.notes && <p className="text-zinc-500 text-xs mt-2">ملاحظات: {order.notes}</p>}
+
             <div className="flex gap-2 mt-3">
-              {nextStatus(order.status) && (
-                <Button size="sm" onClick={() => updateStatus(order._id, nextStatus(order.status))}>
-                  ← {statusAr[nextStatus(order.status)]}
-                </Button>
-              )}
-              {order.status !== 'cancelled' && order.status !== 'delivered' && (
-                <Button size="sm" variant="danger" onClick={() => updateStatus(order._id, 'cancelled')}>
-                  إلغاء
-                </Button>
-              )}
+              <select
+                value=""
+                onChange={e => { if (e.target.value) updateStatus(order._id, e.target.value) }}
+                className="px-3 py-2 rounded-lg border border-zinc-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-brand/30 cursor-pointer"
+              >
+                <option value="" disabled>تغيير الحالة...</option>
+                {validTransitions[order.status]?.map(t => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
             </div>
           </div>
         ))}

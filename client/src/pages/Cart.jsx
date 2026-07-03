@@ -49,7 +49,7 @@ export default function Cart() {
                   </button>
                 </div>
                 <div className="text-left min-w-[80px]">
-                  <span className="font-bold text-zinc-900">{(item.price * item.quantity).toFixed(2)} $</span>
+                  <span className="font-bold text-zinc-900">{(item.price * item.quantity).toFixed(2)} ج.م</span>
                 </div>
                 <button onClick={() => removeItem(item._id)} className="p-2 hover:bg-red-50 rounded-lg cursor-pointer">
                   <Trash2 className="w-4 h-4 text-red-400" />
@@ -70,7 +70,7 @@ export default function Cart() {
             </div>
             <div className="border-t border-zinc-100 pt-3 flex justify-between mb-6">
               <span className="font-bold text-zinc-900">المجموع</span>
-              <span className="font-bold text-lg text-brand">{total.toFixed(2)} $</span>
+              <span className="font-bold text-lg text-brand">{total.toFixed(2)} ج.م</span>
             </div>
             <Link to="/checkout">
               <Button className="w-full" size="lg">اتابع الطلب</Button>

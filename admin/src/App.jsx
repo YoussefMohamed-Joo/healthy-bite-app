@@ -3,9 +3,17 @@ import { AuthProvider, useAuth } from '@/context/AuthContext'
 import Login from '@/pages/Login'
 import Products from '@/pages/Products'
 import Orders from '@/pages/Orders'
+import Customers from '@/pages/Customers'
 
 function AdminLayout({ children }) {
   const { user, logout } = useAuth()
+  const currentPath = window.location.pathname
+  const tabs = [
+    { path: '/', label: 'المنتجات' },
+    { path: '/orders', label: 'الطلبات' },
+    { path: '/customers', label: 'العملاء' },
+  ]
+
   return (
     <div className="min-h-screen bg-zinc-50">
       <header className="bg-white border-b border-zinc-100 h-14 flex items-center px-6 sticky top-0 z-10">
@@ -15,9 +23,20 @@ function AdminLayout({ children }) {
               <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-extrabold text-sm">H</div>
               <span className="font-cairo font-bold text-zinc-900">Admin</span>
             </div>
-            <nav className="flex gap-4">
-              <a href="/" className="text-sm font-semibold text-brand">المنتجات</a>
-              <a href="/orders" className="text-sm font-semibold text-zinc-500 hover:text-zinc-900">الطلبات</a>
+            <nav className="flex gap-1">
+              {tabs.map(tab => (
+                <a
+                  key={tab.path}
+                  href={tab.path}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors no-underline ${
+                    currentPath === tab.path
+                      ? 'bg-brand-light text-brand'
+                      : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
+                  }`}
+                >
+                  {tab.label}
+                </a>
+              ))}
             </nav>
           </div>
           <div className="flex items-center gap-3">
@@ -45,6 +64,7 @@ function AppRoutes() {
       <Route path="/login" element={isAuth ? <Navigate to="/" replace /> : <Login />} />
       <Route path="/" element={<AdminRoute><AdminLayout><Products /></AdminLayout></AdminRoute>} />
       <Route path="/orders" element={<AdminRoute><AdminLayout><Orders /></AdminLayout></AdminRoute>} />
+      <Route path="/customers" element={<AdminRoute><AdminLayout><Customers /></AdminLayout></AdminRoute>} />
     </Routes>
   )
 }

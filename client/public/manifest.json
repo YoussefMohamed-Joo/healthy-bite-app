@@ -1,0 +1,20 @@
+{
+  "name": "HealthyBite",
+  "short_name": "HealthyBite",
+  "description": "أكل صحي يوصل لباب بيتك — اطلب وجباتك الصحية بضغطة زر",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#237C3C",
+  "theme_color": "#237C3C",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "categories": ["food", "health", "lifestyle"],
+  "prefer_related_applications": false
+}

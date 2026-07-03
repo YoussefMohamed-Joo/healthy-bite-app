@@ -5,13 +5,23 @@ const API = import.meta.env.VITE_API_URL || ''
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [token, setToken] = useState(() => localStorage.getItem('admin_token'))
+  const [token, setToken] = useState(() => {
+    const urlToken = new URLSearchParams(window.location.search).get('token')
+    if (urlToken) {
+      localStorage.setItem('admin_token', urlToken)
+      window.history.replaceState({}, '', window.location.pathname)
+      return urlToken
+    }
+    return localStorage.getItem('admin_token')
+  })
 
   useEffect(() => {
     if (token) {
       localStorage.setItem('admin_token', token)
       fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => r.json()).then(u => { if (u.role === 'admin') setUser(u); else logout() }).catch(logout)
+        .then(r => r.json())
+        .then(u => { if (u.user?.role === 'admin') setUser(u.user); else logout() })
+        .catch(logout)
     }
   }, [token])
 

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HealthyBite</string>
+    <string name="title_activity_main">HealthyBite</string>
+    <string name="package_name">com.healthybite.app</string>
+    <string name="custom_url_scheme">com.healthybite.app</string>
+</resources>

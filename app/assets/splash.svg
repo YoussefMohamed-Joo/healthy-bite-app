@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1284 2778">
+  <rect width="1284" height="2778" fill="#237C3C"/>
+  <!-- Center leaf -->
+  <g transform="translate(642, 1200)">
+    <path d="M0-200 C120-200 200-100 200 0 C200 80 120 140 60 180 L0 40 C0 40 -60 80 -120 40 C-180 0 -200-80 -200-140 C-200-200 -120-200 0-200Z" fill="white" opacity="0.95"/>
+  </g>
+  <text x="642" y="1550" text-anchor="middle" font-family="Cairo, sans-serif" font-size="120" font-weight="800" fill="white">HealthyBite</text>
+  <text x="642" y="1700" text-anchor="middle" font-family="Cairo, sans-serif" font-size="50" fill="white" opacity="0.8">أكل صحي يوصل لباب بيتك</text>
+</svg>
