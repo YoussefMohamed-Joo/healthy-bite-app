@@ -119,25 +119,6 @@ app.use(errorHandler)
 io.on('connection', (socket) => {
   logger.info(`Socket connected: ${socket.id}`)
   socket.on('join-admin', () => socket.join('admin-room'))
-
-  // Chat rooms
-  socket.on('chat:join', (chatId) => {
-    socket.join(`chat:${chatId}`)
-    logger.info(`Socket ${socket.id} joined chat:${chatId}`)
-  })
-
-  socket.on('chat:leave', (chatId) => {
-    socket.leave(`chat:${chatId}`)
-  })
-
-  socket.on('chat:typing', (data) => {
-    socket.to(`chat:${data.chatId}`).emit('chat:typing', {
-      chatId: data.chatId,
-      userId: data.userId,
-      isTyping: data.isTyping,
-    })
-  })
-
   socket.on('disconnect', () => logger.info(`Socket disconnected: ${socket.id}`))
 })
 

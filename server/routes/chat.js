@@ -1,97 +1,134 @@
 import { Router } from 'express'
-import Chat from '../models/Chat.js'
-import Message from '../models/Message.js'
 import { authRequired, adminRequired } from '../middleware/auth.js'
 import catchAsync from '../utils/catchAsync.js'
-import ApiError from '../utils/ApiError.js'
+import { supabase } from '../utils/supabase.js'
+import { logActivity } from '../services/activityService.js'
 
 const router = Router()
 
-// Admin: get all chats
+// Admin: list all conversations
 router.get('/', adminRequired, catchAsync(async (req, res) => {
   const { status } = req.query
-  const filter = status ? { status } : {}
-  const chats = await Chat.find(filter)
-    .populate('user', 'name email phone')
-    .sort({ lastMessageAt: -1 })
-  res.json({ data: chats })
+  let query = supabase
+    .from('conversations')
+    .select('*')
+    .order('updated_at', { ascending: false })
+
+  if (status) query = query.eq('status', status)
+
+  const { data, error } = await query
+  if (error) return res.status(500).json({ message: error.message })
+
+  // Attach last message per conversation
+  const conversations = await Promise.all((data || []).map(async (conv) => {
+    const { data: msgs } = await supabase
+      .from('messages')
+      .select('content, created_at, sender_role')
+      .eq('conversation_id', conv.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+    return { ...conv, lastMessage: msgs?.[0] || null }
+  }))
+
+  res.json({ data: conversations })
 }))
 
-// User: get my active chat or create one
+// User: get my active conversation or create one
 router.get('/my', authRequired, catchAsync(async (req, res) => {
-  let chat = await Chat.findOne({ user: req.user._id, status: 'active' })
-    .populate('user', 'name email phone')
-  if (!chat) {
-    chat = await Chat.create({ user: req.user._id })
-    chat = await Chat.findById(chat._id).populate('user', 'name email phone')
+  const userId = String(req.user._id)
+
+  let { data: conv } = await supabase
+    .from('conversations')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .single()
+
+  if (!conv) {
+    const { data: newConv, error } = await supabase
+      .from('conversations')
+      .insert({
+        user_id: userId,
+        user_name: req.user.name || '',
+        user_email: req.user.email || '',
+      })
+      .select()
+      .single()
+
+    if (error) return res.status(500).json({ message: error.message })
+    conv = newConv
   }
-  chat.unreadUser = 0
-  await chat.save()
-  res.json({ data: chat })
+
+  res.json({ data: conv })
 }))
 
-// Get messages for a chat
+// Get messages for a conversation
 router.get('/:id/messages', catchAsync(async (req, res) => {
-  const messages = await Message.find({ chat: req.params.id }).sort({ createdAt: 1 })
-  res.json({ data: messages })
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('conversation_id', req.params.id)
+    .order('created_at', { ascending: true })
+
+  if (error) return res.status(500).json({ message: error.message })
+  res.json({ data: data || [] })
 }))
 
 // Send a message
 router.post('/:id/message', authRequired, catchAsync(async (req, res) => {
-  const { text, type, image } = req.body
-  const chat = await Chat.findById(req.params.id)
-  if (!chat) throw new ApiError(404, 'Chat not found')
+  const { content } = req.body
+  if (!content?.trim()) return res.status(400).json({ message: 'Message is required' })
 
-  const sender = req.user.role === 'admin' ? 'admin' : 'user'
+  const senderRole = req.user.role === 'admin' ? 'admin' : 'user'
 
-  const message = await Message.create({
-    chat: chat._id,
-    sender,
-    text: text || '',
-    type: type || 'text',
-    image: image || null,
-  })
-
-  chat.lastMessage = text || (type === 'image' ? '🖼 صورة' : '')
-  chat.lastMessageAt = new Date()
-  if (sender === 'admin') chat.unreadUser += 1
-  else chat.unreadAdmin += 1
-  await chat.save()
-
-  const io = req.app.get('io')
-  if (io) {
-    io.to(`chat:${chat._id}`).emit('chat:message', {
-      ...message.toObject(),
-      chat: chat._id,
+  const { data, error } = await supabase
+    .from('messages')
+    .insert({
+      conversation_id: req.params.id,
+      sender_id: String(req.user._id),
+      sender_role: senderRole,
+      content: content.trim(),
     })
-  }
+    .select()
+    .single()
 
-  res.json({ data: message })
+  if (error) return res.status(500).json({ message: error.message })
+
+  // Touch updated_at on conversation
+  await supabase
+    .from('conversations')
+    .update({ updated_at: new Date().toISOString() })
+    .eq('id', req.params.id)
+
+  await logActivity(req.user._id, 'chat_message', `رسالة جديدة في المحادثة ${req.params.id}`)
+
+  res.json({ data })
 }))
 
-// Mark messages as read
-router.patch('/:id/read', authRequired, catchAsync(async (req, res) => {
-  const chat = await Chat.findById(req.params.id)
-  if (!chat) throw new ApiError(404, 'Chat not found')
-
-  if (req.user.role === 'admin') chat.unreadAdmin = 0
-  else chat.unreadUser = 0
-  await chat.save()
-
-  await Message.updateMany({ chat: chat._id, read: false }, { read: true })
-  res.json({ success: true })
-}))
-
-// Admin: resolve a chat
+// Admin: resolve
 router.patch('/:id/resolve', adminRequired, catchAsync(async (req, res) => {
-  const chat = await Chat.findByIdAndUpdate(req.params.id, { status: 'resolved' }, { new: true })
-  res.json({ data: chat })
+  const { data, error } = await supabase
+    .from('conversations')
+    .update({ status: 'resolved', updated_at: new Date().toISOString() })
+    .eq('id', req.params.id)
+    .select()
+    .single()
+
+  if (error) return res.status(500).json({ message: error.message })
+  res.json({ data })
 }))
 
-// Admin: reopen a chat
+// Admin: reopen
 router.patch('/:id/reopen', adminRequired, catchAsync(async (req, res) => {
-  const chat = await Chat.findByIdAndUpdate(req.params.id, { status: 'active' }, { new: true })
-  res.json({ data: chat })
+  const { data, error } = await supabase
+    .from('conversations')
+    .update({ status: 'active', updated_at: new Date().toISOString() })
+    .eq('id', req.params.id)
+    .select()
+    .single()
+
+  if (error) return res.status(500).json({ message: error.message })
+  res.json({ data })
 }))
 
 export default router
