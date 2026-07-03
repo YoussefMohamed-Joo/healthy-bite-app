@@ -43,7 +43,7 @@ router.get('/version', async (req, res) => {
         forceUpdate: major >= 10,
       },
     })
-  } catch (err) {
+  } catch {
     res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false } })
   }
 })
