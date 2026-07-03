@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { X, Download, Smartphone, QrCode, Bell } from 'lucide-react'
 import { getDeviceType } from '@/utils/device'
 import { trackDownload } from '@/utils/tracking'
+import DownloadGuide from './DownloadGuide'
 
 const API = import.meta.env.VITE_API_URL || 'https://healthybite-server.vercel.app'
 const APK_PATH = `${API}/api/download/android`
@@ -11,6 +12,7 @@ export default function AppManager() {
   const [device, setDevice] = useState('desktop')
   const [dismissed, setDismissed] = useState(false)
   const [showQR, setShowQR] = useState(false)
+  const [showGuide, setShowGuide] = useState(false)
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -54,7 +56,7 @@ export default function AppManager() {
             {apkReady ? (
               <a
                 href={APK_PATH}
-                onClick={() => trackDownload('android')}
+                onClick={(e) => { trackDownload('android'); setTimeout(() => setShowGuide(true), 500) }}
                 className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-brand text-white text-sm font-bold hover:bg-brand-dark transition-colors no-underline cursor-pointer"
               >
                 <Download className="w-4 h-4" />
@@ -85,6 +87,7 @@ export default function AppManager() {
             </button>
           </div>
         </div>
+        <DownloadGuide show={showGuide} onClose={() => setShowGuide(false)} />
       </div>
     )
   }
@@ -112,7 +115,7 @@ export default function AppManager() {
             {apkReady ? (
               <a
                 href={APK_PATH}
-                onClick={() => trackDownload('android')}
+                onClick={(e) => { trackDownload('android'); setTimeout(() => setShowGuide(true), 500) }}
                 className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-brand text-white text-sm font-bold hover:bg-brand-dark transition-colors no-underline cursor-pointer"
               >
                 <Download className="w-4 h-4" />
@@ -142,6 +145,7 @@ export default function AppManager() {
           </div>
         </div>
       )}
+      <DownloadGuide show={showGuide} onClose={() => setShowGuide(false)} />
     </>
   )
 }

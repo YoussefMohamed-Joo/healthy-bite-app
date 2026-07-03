@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Download, Smartphone, Loader2 } from 'lucide-react'
 import { trackDownload } from '@/utils/tracking'
+import DownloadGuide from './DownloadGuide'
 
 const API = import.meta.env.VITE_API_URL || 'https://healthybite-server.vercel.app'
 
 export default function MobileDownload() {
   const [apkExists, setApkExists] = useState(null)
+  const [showGuide, setShowGuide] = useState(false)
 
   useEffect(() => {
     fetch(`${API}/mobile/build-status`)
@@ -38,7 +40,7 @@ export default function MobileDownload() {
             <a
               href={`${API}/api/download/android`}
               className="flex items-center gap-3 px-8 py-3.5 rounded-xl bg-white text-brand hover:shadow-lg hover:-translate-y-0.5 text-sm font-bold transition-all no-underline"
-              onClick={() => trackDownload('android')}
+              onClick={(e) => { trackDownload('android'); setTimeout(() => setShowGuide(true), 500) }}
             >
               <Download className="w-5 h-5" />
               <div className="text-right">
@@ -57,6 +59,7 @@ export default function MobileDownload() {
           )}
         </div>
       </div>
+      <DownloadGuide show={showGuide} onClose={() => setShowGuide(false)} />
     </section>
   )
 }

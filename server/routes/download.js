@@ -36,7 +36,20 @@ router.get('/android', optionalAuth, async (req, res) => {
     })
   } catch { /* silent */ }
 
-  res.redirect(302, APK_URL)
+  try {
+    const response = await fetch(APK_URL)
+    if (!response.ok) throw new Error(`GitHub returned ${response.status}`)
+
+    const buffer = Buffer.from(await response.arrayBuffer())
+    res.setHeader('Content-Type', 'application/vnd.android.package-archive')
+    res.setHeader('Content-Disposition', 'attachment; filename="HealthyBite.apk"')
+    res.setHeader('Content-Length', buffer.length)
+    res.setHeader('Accept-Ranges', 'bytes')
+    res.setHeader('Cache-Control', 'public, max-age=3600')
+    res.status(200).send(buffer)
+  } catch {
+    res.redirect(302, APK_URL)
+  }
 })
 
 export default router
