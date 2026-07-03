@@ -19,18 +19,20 @@ router.get('/build-status', async (req, res) => {
   }
 })
 
-router.get('/version', async (_req, res) => {
+router.get('/version', async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
   res.setHeader('Pragma', 'no-cache')
   res.setHeader('Expires', '0')
   try {
     const response = await fetch('https://api.github.com/repos/YoussefMohamed-Joo/healthy-bite-app/releases/latest', {
-      headers: { 'Accept': 'application/vnd.github+json' },
+      headers: { 'Accept': 'application/vnd.github+json', 'User-Agent': 'HealthyBite-Server/1.0' },
     })
-    if (!response.ok) return res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false } })
+    if (!response.ok) {
+      return res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false }, debug: { status: response.status, statusText: response.statusText } })
+    }
     const data = await response.json()
-    const version = data.tag_name?.replace('v', '') || '1.0.0'
-    const major = parseInt(version.split('.')[0]) || parseInt(version)
+    const version = String(data.tag_name || '1.0.0').replace('v', '')
+    const major = parseInt(version, 10) || 0
     res.json({
       status: 'success',
       data: {
@@ -40,8 +42,8 @@ router.get('/version', async (_req, res) => {
         forceUpdate: major >= 10,
       },
     })
-  } catch {
-    res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false } })
+  } catch (err) {
+    res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false }, debug: { error: err.message, stack: err.stack?.split('\n')[0] } })
   }
 })
 
