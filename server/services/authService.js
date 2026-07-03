@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import User from '../models/User.js'
+import Order from '../models/Order.js'
 import { generateToken } from '../middleware/auth.js'
 import ApiError from '../utils/ApiError.js'
 import { logActivity } from './activityService.js'
@@ -8,7 +9,15 @@ const ADMIN_EMAIL = 'admin@healthybite.com'
 
 export async function registerUser({ name, email, password, phone, address, req }, io) {
   const existing = await User.findOne({ email })
-  if (existing) throw new ApiError(400, 'Email already registered')
+
+  if (existing) {
+    if (existing.active) {
+      throw new ApiError(400, 'البريد الإلكتروني مسجل بالفعل')
+    }
+    existing.email = `deleted_${Date.now()}_${email}`
+    existing.active = false
+    await existing.save()
+  }
 
   const ip = req?.headers?.['x-forwarded-for']?.split(',')[0]?.trim()
     || req?.headers?.['x-real-ip']
@@ -22,13 +31,21 @@ export async function registerUser({ name, email, password, phone, address, req 
 
   const deviceType = /android/i.test(userAgent) ? 'android' : /iphone|ipad|ipod/i.test(userAgent) ? 'ios' : 'desktop'
 
-  const user = await User.create({
-    name, email, password, phone, address, role,
-    registrationIp: ip,
-    registrationDevice: deviceType,
-    registrationReferrer: referrer,
-    devices: [deviceType].filter(Boolean),
-  })
+  let user
+  try {
+    user = await User.create({
+      name, email, password, phone, address, role,
+      registrationIp: ip,
+      registrationDevice: deviceType,
+      registrationReferrer: referrer,
+      devices: [deviceType].filter(Boolean),
+    })
+  } catch (err) {
+    if (err.code === 11000) {
+      throw new ApiError(400, 'البريد الإلكتروني مسجل بالفعل')
+    }
+    throw new ApiError(500, 'حدث خطأ أثناء إنشاء الحساب')
+  }
   if (!user.sessions) user.sessions = []
   user.sessions.push({ sessionId, device: userAgent, ip })
   await user.save()
@@ -133,12 +150,15 @@ export async function deleteAccount(userId) {
   if (user.role === 'admin') throw new ApiError(403, 'Admin accounts cannot be deleted')
 
   const timestamp = Date.now()
-  user.email = `deleted_${timestamp}_${user.email}`
+  const originalEmail = user.email
+  user.email = `deleted_${timestamp}_${originalEmail}`
   user.active = false
   user.sessions = []
   await user.save()
 
-  await logActivity(userId, 'account_deleted', `تم حذف الحساب — البريد الأصلي: ${user.email.replace(`deleted_${timestamp}_`, '')}`)
+  await Order.updateMany({ user: userId }, { user: null, email: '' })
+
+  await logActivity(userId, 'account_deleted', `تم حذف الحساب — البريد الأصلي: ${originalEmail}`)
   return { message: 'Account deleted' }
 }
 
