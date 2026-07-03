@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Check, Sparkles, Loader2 } from 'lucide-react'
@@ -24,12 +25,24 @@ export default function Plans() {
   )
 
   return (
-    <section className="min-h-screen bg-zinc-50 pt-[70px]">
-      <div className="max-w-[1320px] mx-auto px-6 py-16">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <h1 className="font-cairo text-3xl md:text-4xl font-extrabold text-zinc-900 mb-3">خطط الاشتراك الشهري</h1>
-          <p className="text-zinc-500 max-w-xl mx-auto">اختر الخطة اللي تناسب أهدافك، وكلها تشمل توصيل مجاني — ألغي أو عدل أي وقت</p>
-        </motion.div>
+    <>
+      <Helmet>
+        <title>خطط الاشتراك الشهري — Helthy Bite</title>
+        <meta name="description" content="اشترك في خطة وجبات صحية شهرية من Helthy Bite. اختر الخطة اللي تناسب أهدافك. توصيل مجاني — إلغاء أو تعديل أي وقت." />
+        <meta property="og:title" content="خطط الاشتراك الشهري — Helthy Bite" />
+        <meta property="og:description" content="اشترك في خطة وجبات صحية شهرية من Helthy Bite. اختر الخطة اللي تناسب أهدافك." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/plans" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/plans" />
+      </Helmet>
+      <section className="min-h-screen bg-zinc-50 pt-[70px]">
+        <div className="max-w-[1320px] mx-auto px-6 py-16">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
+            <h1 className="font-cairo text-3xl md:text-4xl font-extrabold text-zinc-900 mb-3">خطط الاشتراك الشهري</h1>
+            <p className="text-zinc-500 max-w-xl mx-auto">اختر الخطة اللي تناسب أهدافك، وكلها تشمل توصيل مجاني — ألغي أو عدل أي وقت</p>
+          </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1100px] mx-auto">
           {plans.map((plan, i) => (
@@ -82,6 +95,7 @@ export default function Plans() {
           </Link>
         </motion.div>
       </div>
-    </section>
+      </section>
+    </>
   )
 }

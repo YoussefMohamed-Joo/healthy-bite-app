@@ -76,7 +76,7 @@ export default function WelcomeOverlay({ type, name, onDone }) {
                 transition={{ type: 'spring', damping: 10 }}
                 className="font-cairo text-2xl font-extrabold text-zinc-900 mb-2"
               >
-                {isWelcome ? 'أهلاً بك في HealthyBite! 🎉' : 'مرحباً بعودتك! 👋'}
+                {isWelcome ? 'أهلاً بك في Helthy Bite! 🎉' : 'مرحباً بعودتك! 👋'}
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0 }}

@@ -24,7 +24,7 @@ export default function MobileDownload() {
           تطبيق الموبايل
         </div>
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-          حمل تطبيق HealthyBite
+          حمل تطبيق Helthy Bite
         </h2>
         <p className="text-white/80 text-sm mb-8 max-w-lg mx-auto">
           اطلب وجباتك الصحية بضغطة زر

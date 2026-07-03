@@ -27,7 +27,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2.5 mb-4">
               <Leaf className="w-6 h-6 text-[#4caf50]" />
-              <span className="font-bold text-lg">Healthy<span className="text-[#4caf50]">Bite</span></span>
+              <span className="font-bold text-lg">Helthy <span className="text-[#4caf50]">Bite</span></span>
             </div>
             <p className="text-[#9ca3af] text-sm leading-relaxed">
               وجبات صحية طازة توصل لباب بيتك. سعرات محسوبة، مكونات طبيعية، وطعم جامد.
@@ -99,7 +99,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-10 pt-6 text-center text-[#6b7280] text-xs">
-          © {new Date().getFullYear()} HealthyBite. جميع الحقوق محفوظة. <br />بتصميم وتطوير المهندس <span className="text-[#4caf50]">يوسف محمد</span>.
+          © {new Date().getFullYear()} Helthy Bite. جميع الحقوق محفوظة. <br />بتصميم وتطوير المهندس <span className="text-[#4caf50]">يوسف محمد</span>.
         </div>
       </div>
     </footer>

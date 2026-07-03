@@ -1,6 +1,6 @@
 {
-  "name": "HealthyBite",
-  "short_name": "HealthyBite",
+  "name": "Helthy Bite",
+  "short_name": "Helthy Bite",
   "description": "أكل صحي يوصل لباب بيتك — اطلب وجباتك الصحية بضغطة زر",
   "start_url": "/",
   "display": "standalone",

@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
-import { Bot, Send, Loader2, Sparkles } from 'lucide-react'
+import { Bot, Send, Loader2, Sparkles, AlertCircle } from 'lucide-react'
+
+const API = import.meta.env.VITE_API_URL || ''
 
 export default function AiAssistant() {
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'مرحباً! أنا مساعد HealthyBite الذكي. اسألني أي شيء عن الموقع، الطلبات، أو التغذية.' },
+    { role: 'assistant', content: 'مرحباً! أنا مساعد Helthy Bite الذكي. اسألني أي شيء عن الموقع، الطلبات، أو التغذية.' },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -21,7 +23,7 @@ export default function AiAssistant() {
     setLoading(true)
 
     try {
-      const res = await fetch('/ai/ask', {
+      const res = await fetch(`${API}/ai/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

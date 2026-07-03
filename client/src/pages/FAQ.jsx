@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Search, Loader2 } from 'lucide-react'
@@ -28,12 +29,24 @@ export default function FAQ() {
   )
 
   return (
-    <section className="min-h-screen bg-zinc-50 pt-[70px]">
-      <div className="max-w-[800px] mx-auto px-6 py-14">
-        <div className="text-center mb-10">
-          <h1 className="font-cairo text-3xl md:text-4xl font-bold text-zinc-900 mb-3">الأسئلة الشائعة</h1>
-          <p className="text-zinc-500 text-base">كل ما تحتاج معرفته عن توصيل الوجبات الصحية في مصر.</p>
-        </div>
+    <>
+      <Helmet>
+        <title>الأسئلة الشائعة — Helthy Bite</title>
+        <meta name="description" content="كل ما تحتاج معرفته عن Helthy Bite: التوصيل، الدفع، الإلغاء، الاشتراكات، وأكثر." />
+        <meta property="og:title" content="الأسئلة الشائعة — Helthy Bite" />
+        <meta property="og:description" content="كل ما تحتاج معرفته عن Helthy Bite: التوصيل، الدفع، الإلغاء، الاشتراكات." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/faq" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/faq" />
+      </Helmet>
+      <section className="min-h-screen bg-zinc-50 pt-[70px]">
+        <div className="max-w-[800px] mx-auto px-6 py-14">
+          <div className="text-center mb-10">
+            <h1 className="font-cairo text-3xl md:text-4xl font-bold text-zinc-900 mb-3">الأسئلة الشائعة</h1>
+            <p className="text-zinc-500 text-base">كل ما تحتاج معرفته عن توصيل الوجبات الصحية في مصر.</p>
+          </div>
 
         <div className="relative mb-10">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
@@ -92,6 +105,7 @@ export default function FAQ() {
           </div>
         )}
       </div>
-    </section>
+      </section>
+    </>
   )
 }

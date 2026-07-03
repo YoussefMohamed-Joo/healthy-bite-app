@@ -11,20 +11,29 @@ function getSignOptions() {
   return { algorithm: 'HS256', secret: config.jwtSecret }
 }
 
-export const generateToken = (userId, sessionId) => {
+export const generateToken = (userId, sessionId, rememberMe = false) => {
   const opts = getSignOptions()
+  const expiresIn = rememberMe ? config.jwtLongExpiry : config.jwtExpiresIn
+
   if (opts.algorithm === 'RS256') {
-    return jwt.sign({ userId, sessionId }, opts.privateKey, { algorithm: 'RS256', expiresIn: config.jwtExpiresIn })
+    return jwt.sign({ userId, sessionId }, opts.privateKey, { algorithm: 'RS256', expiresIn })
   }
-  return jwt.sign({ userId, sessionId }, opts.secret, { expiresIn: config.jwtExpiresIn })
+  return jwt.sign({ userId, sessionId }, opts.secret, { expiresIn })
 }
 
-export const TOKEN_COOKIE_OPTIONS = {
+export const TOKEN_COOKIE_OPTIONS = (rememberMe = false) => ({
   httpOnly: true,
   secure: config.env === 'production',
-  sameSite: 'strict',
+  sameSite: config.env === 'production' ? 'none' : 'lax',
   path: '/',
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000,
+})
+
+function getIp(req) {
+  return req?.headers?.['x-forwarded-for']?.split(',')[0]?.trim()
+    || req?.headers?.['x-real-ip']
+    || req?.socket?.remoteAddress
+    || ''
 }
 
 function extractToken(req) {
@@ -51,12 +60,20 @@ async function authenticate(req) {
   const user = await User.findById(decoded.userId)
   if (!user || !user.active) throw new ApiError(401, 'User not found or deactivated')
 
-  if (decoded.sessionId && (!user.sessions || !user.sessions.some(s => s.sessionId === decoded.sessionId))) {
-    throw new ApiError(401, 'Session expired, please login again')
+  if (decoded.sessionId) {
+    const sessionMatch = user.sessions?.some(s => s.sessionId === decoded.sessionId)
+    if (!sessionMatch) {
+      const ip = getIp(req)
+      const ipMatch = user.sessions?.some(s => s.ip === ip)
+      if (!ipMatch) {
+        throw new ApiError(401, 'Session expired, please login again')
+      }
+    }
   }
 
   req.user = user
   req.userId = user._id
+  req.sessionId = decoded.sessionId
 }
 
 export const authRequired = catchAsync(async (req, res, next) => {
@@ -80,8 +97,15 @@ export const optionalAuth = catchAsync(async (req, res, next) => {
         : jwt.verify(token, opts.secret)
       const user = await User.findById(decoded.userId)
       if (user && user.active) {
-        if (decoded.sessionId && (!user.sessions || !user.sessions.some(s => s.sessionId === decoded.sessionId))) {
-          throw new ApiError(401, 'Session expired')
+        if (decoded.sessionId) {
+          const sessionMatch = user.sessions?.some(s => s.sessionId === decoded.sessionId)
+          if (!sessionMatch) {
+            const ip = getIp(req)
+            const ipMatch = user.sessions?.some(s => s.ip === ip)
+            if (!ipMatch) {
+              throw new ApiError(401, 'Session expired')
+            }
+          }
         }
         req.user = user
         req.userId = user._id

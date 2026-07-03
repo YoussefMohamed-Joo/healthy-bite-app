@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  productId String   @map("product_id")
+  rating    Int      @default(5)
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([productId])
+  @@index([userId])
+  @@index([productId, rating])
+  @@map("reviews")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String   @map("order_id")
+  productId   String   @map("product_id")
+  productName String   @map("product_name")
+  productImage String? @map("product_image")
+  quantity    Int      @default(1)
+  unitPrice   Float    @map("unit_price")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Address {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  label     String   @default("المنزل")
+  fullName  String   @map("full_name")
+  phone     String
+  street    String
+  city      String   @default("بني سويف")
+  notes     String?
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String   @default("order")
+  title     String
+  body      String
+  data      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, read])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model CouponUsage {
+  id        String   @id @default(uuid())
+  couponId  String   @map("coupon_id")
+  userId    String   @map("user_id")
+  orderId   String?  @map("order_id")
+  discount  Float
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([couponId])
+  @@index([userId])
+  @@unique([couponId, userId])
+  @@map("coupon_usages")
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  userName  String    @default("") @map("user_name")
+  userEmail String    @default("") @map("user_email")
+  status    String    @default("active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  messages  Message[]
+
+  @@index([userId])
+  @@index([status, updatedAt])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String       @map("conversation_id")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String       @map("sender_id")
+  senderRole     String       @map("sender_role")
+  content        String       @default("")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}

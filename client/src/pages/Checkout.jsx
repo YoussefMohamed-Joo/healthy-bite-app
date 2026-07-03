@@ -1,16 +1,20 @@
-import { useState } from 'react'
+import { Helmet } from 'react-helmet-async'
+import { useState, lazy, Suspense } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '@/context/CartContext'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, Smartphone, Landmark, Wallet, Upload, Image } from 'lucide-react'
+import { CheckCircle, Smartphone, Landmark, Wallet, Upload, Image, CreditCard, AlertCircle, Loader2 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+const StripePayment = lazy(() => import('@/components/StripePayment'))
 
 const API = import.meta.env.VITE_API_URL || ''
+const hasStripe = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 
 const paymentMethods = [
   { id: 'cash', label: 'الدفع عند الاستلام', icon: Wallet, desc: 'ادفع كاش لما الطلب يوصل لك' },
   { id: 'vodafone_cash', label: 'فودافون كاش', icon: Smartphone, desc: 'ادفع عبر محفظة فودافون كاش' },
   { id: 'fawry', label: 'فوري', icon: Landmark, desc: 'ادفع عبر فوري' },
+  ...(hasStripe ? [{ id: 'card', label: 'بطاقة ائتمان', icon: CreditCard, desc: 'ادفع ببطاقتك البنكية' }] : []),
 ]
 
 export default function Checkout() {
@@ -40,22 +44,35 @@ export default function Checkout() {
 
   if (done) {
     return (
-      <section className="min-h-screen bg-zinc-50 pt-[70px] flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-6">
-          <CheckCircle className="w-20 h-20 text-brand mx-auto mb-4" />
-          <h2 className="font-cairo text-2xl font-bold text-zinc-900 mb-2">
-            {done.paymentMethod === 'cash' ? 'تم تأكيد الطلب! 🎉' : 'بانتظار تأكيد الدفع! 🎉'}
-          </h2>
-          <p className="text-zinc-500 mb-2">
-            {done.paymentMethod === 'cash'
-              ? 'هنوصلك في أسرع وقت'
-              : 'سيتم مراجعة الدفع وتأكيد الطلب من قبل الإدارة'}
-          </p>
-          <Button onClick={() => navigate('/my-orders')} className="mt-2">
-            متابعة الطلب
-          </Button>
-        </div>
-      </section>
+      <>
+        <Helmet>
+          <title>إتمام الطلب — Helthy Bite</title>
+          <meta name="description" content="أكمل طلب وجباتك الصحية من Helthy Bite. أدخل بيانات التوصيل واختر طريقة الدفع." />
+          <meta property="og:title" content="إتمام الطلب — Helthy Bite" />
+          <meta property="og:description" content="أكمل طلب وجباتك الصحية من Helthy Bite." />
+          <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+          <meta property="og:url" content="https://helthybite.vercel.app/checkout" />
+          <meta property="og:type" content="website" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <link rel="canonical" href="https://helthybite.vercel.app/checkout" />
+        </Helmet>
+        <section className="min-h-screen bg-zinc-50 pt-[70px] flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto px-6">
+            <CheckCircle className="w-20 h-20 text-brand mx-auto mb-4" />
+            <h2 className="font-cairo text-2xl font-bold text-zinc-900 mb-2">
+              {done.paymentMethod === 'cash' ? 'تم تأكيد الطلب! 🎉' : 'بانتظار تأكيد الدفع! 🎉'}
+            </h2>
+            <p className="text-zinc-500 mb-2">
+              {done.paymentMethod === 'cash'
+                ? 'هنوصلك في أسرع وقت'
+                : 'سيتم مراجعة الدفع وتأكيد الطلب من قبل الإدارة'}
+            </p>
+            <Button onClick={() => navigate('/my-orders')} className="mt-2">
+              متابعة الطلب
+            </Button>
+          </div>
+        </section>
+      </>
     )
   }
 
@@ -79,9 +96,41 @@ export default function Checkout() {
     setCouponLoading(false)
   }
 
+  const [stripeError, setStripeError] = useState('')
+  const [stripeReady, setStripeReady] = useState(false)
+
   const submit = async (e) => {
     e.preventDefault()
     if (step === 0) { setStep(1); return }
+
+    if (paymentMethod === 'card') {
+      if (!stripeReady) return
+      setSubmitting(true)
+      const fd = new FormData()
+      fd.append('items', JSON.stringify(items.map(i => ({ product: i._id, quantity: i.quantity, price: i.price }))))
+      fd.append('total', finalTotal)
+      fd.append('customerName', form.name)
+      fd.append('customerPhone', form.phone)
+      if (form.email) fd.append('email', form.email)
+      fd.append('customerAddress', form.address)
+      fd.append('notes', form.notes)
+      fd.append('paymentMethod', 'card')
+      if (couponResult?.discountAmount > 0) {
+        fd.append('couponCode', couponCode)
+        fd.append('total', finalTotal)
+      }
+      try {
+        const res = await fetch(`${API}/orders`, {
+          method: 'POST', credentials: 'include', body: fd,
+        })
+        if (!res.ok) throw new Error('Failed')
+        const data = await res.json()
+        clearCart()
+        setDone(data.data || { paymentMethod })
+      } catch { alert('حدث خطأ، حاول مرة أخرى') }
+      setSubmitting(false)
+      return
+    }
 
     if (paymentMethod !== 'cash' && !receiptFile) {
       alert('يرجى إرفاق صورة الإيصال')
@@ -125,7 +174,19 @@ export default function Checkout() {
   }
 
   return (
-    <section className="min-h-screen bg-zinc-50 pt-[70px]">
+    <>
+      <Helmet>
+        <title>إتمام الطلب — Helthy Bite</title>
+        <meta name="description" content="أكمل طلب وجباتك الصحية من Helthy Bite. أدخل بيانات التوصيل واختر طريقة الدفع." />
+        <meta property="og:title" content="إتمام الطلب — Helthy Bite" />
+        <meta property="og:description" content="أكمل طلب وجباتك الصحية من Helthy Bite." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/checkout" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/checkout" />
+      </Helmet>
+      <section className="min-h-screen bg-zinc-50 pt-[70px]">
       <div className="max-w-[600px] mx-auto px-6 py-10">
         <h1 className="font-cairo text-3xl font-bold text-zinc-900 mb-8">إتمام الطلب</h1>
 
@@ -204,12 +265,38 @@ export default function Checkout() {
             </div>
           )}
 
-          {/* Step 2: Payment verification (for manual methods) */}
+          {/* Step 2: Payment verification */}
           {step === 1 && (
             <div className="space-y-6">
-              {paymentMethod !== 'cash' ? (
+              {paymentMethod === 'card' ? (
+                <div className="bg-white rounded-2xl border border-zinc-100 p-6">
+                  <h3 className="font-cairo font-bold text-zinc-900 text-lg mb-4">الدفع بالبطاقة</h3>
+                  {stripeError && (
+                    <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm p-3 rounded-xl mb-4">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{stripeError}</span>
+                    </div>
+                  )}
+                  <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-brand" /></div>}>
+                    <StripePayment
+                      amount={finalTotal}
+                      onSuccess={() => setStripeReady(true)}
+                      onError={(msg) => setStripeError(msg)}
+                    />
+                  </Suspense>
+                  {stripeReady && (
+                    <div className="flex gap-3 mt-4">
+                      <Button type="button" variant="outline" onClick={() => setStep(0)} className="flex-1">
+                        رجوع
+                      </Button>
+                      <Button type="submit" className="flex-[2]" size="lg" disabled={submitting}>
+                        {submitting ? 'جاري تأكيد الطلب...' : 'تأكيد الطلب'}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : paymentMethod !== 'cash' ? (
                 <>
-                  {/* Instructions */}
                   <div className="bg-brand-light/20 border border-brand/20 rounded-2xl p-6 text-center">
                     <Smartphone className="w-10 h-10 text-brand mx-auto mb-3" />
                     <h3 className="font-cairo font-bold text-zinc-900 text-lg mb-2">حول المبلغ الآن</h3>
@@ -219,10 +306,9 @@ export default function Checkout() {
                     <p className="text-zinc-600 text-sm">
                       إلى محفظة فودافون كاش: <span className="font-bold text-zinc-900" dir="ltr">01033558125</span>
                     </p>
-                    <p className="text-zinc-400 text-xs mt-2">الرقم خاص بمنصة HealthyBite</p>
+                    <p className="text-zinc-400 text-xs mt-2">الرقم خاص بمنصة Helthy Bite</p>
                   </div>
 
-                  {/* Verification Form */}
                   <div className="bg-white rounded-2xl border border-zinc-100 p-6 space-y-4">
                     <h3 className="font-cairo font-bold text-zinc-900 mb-1">بيانات التحويل</h3>
                     <input
@@ -260,18 +346,21 @@ export default function Checkout() {
                 </div>
               )}
 
-              <div className="flex gap-3">
-                <Button type="button" variant="outline" onClick={() => setStep(0)} className="flex-1">
-                  رجوع
-                </Button>
-                <Button type="submit" className="flex-[2]" size="lg" disabled={submitting}>
-                  {submitting ? 'جاري التأكيد...' : 'تأكيد الطلب'}
-                </Button>
-              </div>
+              {paymentMethod !== 'card' && (
+                <div className="flex gap-3">
+                  <Button type="button" variant="outline" onClick={() => setStep(0)} className="flex-1">
+                    رجوع
+                  </Button>
+                  <Button type="submit" className="flex-[2]" size="lg" disabled={submitting}>
+                    {submitting ? 'جاري التأكيد...' : 'تأكيد الطلب'}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </form>
       </div>
-    </section>
+      </section>
+    </>
   )
 }

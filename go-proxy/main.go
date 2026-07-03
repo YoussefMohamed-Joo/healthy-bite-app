@@ -87,7 +87,7 @@ func loadConfig() Config {
 		RateLimit:   20,
 		Burst:       5,
 		AllowedOrigins: []string{
-			"https://client-one-cyan-92.vercel.app",
+			"https://helthybite.vercel.app",
 			"http://localhost:5173",
 			"http://localhost:3000",
 		},

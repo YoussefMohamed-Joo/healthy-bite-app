@@ -7,7 +7,37 @@ import { logActivity } from './activityService.js'
 
 const ADMIN_EMAIL = 'admin@healthybite.com'
 
-export async function registerUser({ name, email, password, phone, address, req }, io) {
+function getIp(req) {
+  return req?.headers?.['x-forwarded-for']?.split(',')[0]?.trim()
+    || req?.headers?.['x-real-ip']
+    || req?.socket?.remoteAddress
+    || ''
+}
+
+function getDeviceType(userAgent) {
+  return /android/i.test(userAgent) ? 'android' : /iphone|ipad|ipod/i.test(userAgent) ? 'ios' : 'desktop'
+}
+
+function reuseOrCreateSession(user, ip, userAgent) {
+  if (!user.sessions) user.sessions = []
+
+  const existing = user.sessions.find(s => s.ip === ip)
+  if (existing) {
+    existing.lastUsed = new Date()
+    existing.device = userAgent
+    return existing.sessionId
+  }
+
+  if (user.sessions.length >= 5) {
+    user.sessions = user.sessions.sort((a, b) => new Date(a.lastUsed || 0) - new Date(b.lastUsed || 0)).slice(0, 4)
+  }
+
+  const sessionId = crypto.randomUUID()
+  user.sessions.push({ sessionId, device: userAgent, ip, lastUsed: new Date() })
+  return sessionId
+}
+
+export async function registerUser({ name, email, password, phone, address, rememberMe, req }, io) {
   const existing = await User.findOne({ email })
 
   if (existing) {
@@ -19,17 +49,12 @@ export async function registerUser({ name, email, password, phone, address, req 
     await existing.save()
   }
 
-  const ip = req?.headers?.['x-forwarded-for']?.split(',')[0]?.trim()
-    || req?.headers?.['x-real-ip']
-    || req?.socket?.remoteAddress
-    || ''
+  const ip = getIp(req)
   const userAgent = req?.headers?.['user-agent'] || ''
   const referrer = req?.headers?.['referer'] || ''
 
   const role = email === ADMIN_EMAIL ? 'admin' : 'client'
-  const sessionId = crypto.randomUUID()
-
-  const deviceType = /android/i.test(userAgent) ? 'android' : /iphone|ipad|ipod/i.test(userAgent) ? 'ios' : 'desktop'
+  const deviceType = getDeviceType(userAgent)
 
   let user
   try {
@@ -46,10 +71,9 @@ export async function registerUser({ name, email, password, phone, address, req 
     }
     throw new ApiError(500, 'حدث خطأ أثناء إنشاء الحساب')
   }
-  if (!user.sessions) user.sessions = []
-  user.sessions.push({ sessionId, device: userAgent, ip })
+  const sessionId = reuseOrCreateSession(user, ip, userAgent)
   await user.save()
-  const token = generateToken(user._id, sessionId)
+  const token = generateToken(user._id, sessionId, rememberMe)
 
   await logActivity(user._id, 'register', `تم إنشاء الحساب من ${deviceType} [${ip}]`)
 
@@ -66,7 +90,7 @@ export async function registerUser({ name, email, password, phone, address, req 
   return { token, user }
 }
 
-export async function loginUser({ email, password, req }) {
+export async function loginUser({ email, password, rememberMe, req }) {
   const user = await User.findOne({ email }).select('+password')
   if (!user || !user.active || user.email?.startsWith('deleted_')) {
     throw new ApiError(400, 'Invalid email or password')
@@ -75,32 +99,23 @@ export async function loginUser({ email, password, req }) {
   const match = await user.comparePassword(password)
   if (!match) throw new ApiError(400, 'Invalid email or password')
 
-  const ip = req?.headers?.['x-forwarded-for']?.split(',')[0]?.trim()
-    || req?.headers?.['x-real-ip']
-    || req?.socket?.remoteAddress
-    || ''
+  const ip = getIp(req)
   const userAgent = req?.headers?.['user-agent'] || ''
-  const deviceType = /android/i.test(userAgent) ? 'android' : /iphone|ipad|ipod/i.test(userAgent) ? 'ios' : 'desktop'
+  const deviceType = getDeviceType(userAgent)
 
   if (email === ADMIN_EMAIL && user.role !== 'admin') {
     user.role = 'admin'
     await user.save()
   }
 
-  const sessionId = crypto.randomUUID()
-
-  if (!user.sessions) user.sessions = []
-  if (user.sessions.length >= 2) {
-    user.sessions = []
-  }
-  user.sessions.push({ sessionId, device: userAgent, ip })
+  const sessionId = reuseOrCreateSession(user, ip, userAgent)
   user.lastLoginIp = ip
   user.lastLoginDevice = deviceType
   if (!user.devices) user.devices = []
   if (!user.devices.includes(deviceType)) user.devices.push(deviceType)
   await user.save()
 
-  const token = generateToken(user._id, sessionId)
+  const token = generateToken(user._id, sessionId, rememberMe)
 
   await logActivity(user._id, 'login', `تم تسجيل الدخول من ${deviceType} [${ip}]`)
 

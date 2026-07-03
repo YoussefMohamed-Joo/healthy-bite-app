@@ -1,8 +1,8 @@
 const BREVO_API = 'https://api.brevo.com/v3/smtp/email'
 
-const SENDER = { name: 'HealthyBite', email: 'bookbeacon.books@gmail.com' }
+const SENDER = { name: 'Helthy Bite', email: 'bookbeacon.books@gmail.com' }
 
-async function sendBrevo({ to, subject, html }) {
+export async function sendBrevo({ to, subject, html }) {
   const res = await fetch(BREVO_API, {
     method: 'POST',
     headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' },
@@ -18,12 +18,12 @@ function wrapHtml(body) {
   return `
     <div dir="rtl" style="font-family: 'Cairo', Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; background: #f9fafb; border-radius: 16px;">
       <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="color: #2E7D32; font-size: 24px; margin: 0;">HealthyBite</h1>
+        <h1 style="color: #2E7D32; font-size: 24px; margin: 0;">Helthy Bite</h1>
         <p style="color: #666; font-size: 14px;">أكل صحي يوصل لباب بيتك</p>
       </div>
       ${body}
       <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
-        <p style="color: #999; font-size: 12px;">© 2026 HealthyBite. جميع الحقوق محفوظة.</p>
+        <p style="color: #999; font-size: 12px;">© 2026 Helthy Bite. جميع الحقوق محفوظة.</p>
       </div>
     </div>`
 }
@@ -44,7 +44,7 @@ function orderItemsHtml(order) {
 export async function sendOtpEmail(email, otp) {
   await sendBrevo({
     to: email,
-    subject: 'رمز التحقق - HealthyBite',
+    subject: 'رمز التحقق - Helthy Bite',
     html: wrapHtml(`
       <div style="background: white; padding: 24px; border-radius: 12px; text-align: center;">
         <h2 style="color: #1a1a1a; font-size: 18px; margin: 0 0 16px;">رمز التحقق الخاص بك</h2>
@@ -60,7 +60,7 @@ export async function sendOtpEmail(email, otp) {
 export async function sendOrderConfirmation(order, email) {
   await sendBrevo({
     to: email,
-    subject: `تأكيد الطلب #${order._id.toString().slice(-6)} - HealthyBite`,
+    subject: `تأكيد الطلب #${order._id.toString().slice(-6)} - Helthy Bite`,
     html: wrapHtml(`
       <div style="background: white; padding: 24px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 16px;">
@@ -70,7 +70,7 @@ export async function sendOrderConfirmation(order, email) {
           <h2 style="color: #2E7D32; font-size: 20px; margin: 8px 0 0;">تم استلام طلبك بنجاح!</h2>
         </div>
         <p style="color: #666; font-size: 14px;">مرحباً <strong>${order.customerName}</strong>،</p>
-        <p style="color: #666; font-size: 14px;">نشكرك على طلبك من HealthyBite. طلبك قيد المراجعة وسنبدأ في تجهيزه قريباً.</p>
+        <p style="color: #666; font-size: 14px;">نشكرك على طلبك من Helthy Bite. طلبك قيد المراجعة وسنبدأ في تجهيزه قريباً.</p>
         ${orderItemsHtml(order)}
         <div style="background: #f9fafb; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 13px; color: #666;">
           <p style="margin: 4px 0;"><strong>العنوان:</strong> ${order.customerAddress}</p>
@@ -113,7 +113,7 @@ export async function sendStatusUpdate(order, email) {
 export async function sendPaymentVerified(order, email) {
   await sendBrevo({
     to: email,
-    subject: `تأكيد الدفع #${order._id.toString().slice(-6)} - HealthyBite`,
+    subject: `تأكيد الدفع #${order._id.toString().slice(-6)} - Helthy Bite`,
     html: wrapHtml(`
       <div style="background: white; padding: 24px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 16px;">
@@ -132,7 +132,7 @@ export async function sendPaymentVerified(order, email) {
 export async function sendOrderCancelled(order, email, reason) {
   await sendBrevo({
     to: email,
-    subject: `إلغاء الطلب #${order._id.toString().slice(-6)} - HealthyBite`,
+    subject: `إلغاء الطلب #${order._id.toString().slice(-6)} - Helthy Bite`,
     html: wrapHtml(`
       <div style="background: white; padding: 24px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 16px;">

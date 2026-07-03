@@ -10,9 +10,6 @@ function obfuscatePlugin() {
     renderChunk(code) {
       return obfuscateCode.obfuscate(code, {
         compact: true,
-        controlFlowFlattening: true,
-        deadCodeInjection: true,
-        selfDefending: true,
         stringArray: true,
         rotateStringArray: true,
       }).getObfuscatedCode()

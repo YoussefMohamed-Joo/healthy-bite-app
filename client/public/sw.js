@@ -1,4 +1,4 @@
-const CACHE = 'healthybite-v1'
+const CACHE = 'helthybite-v1'
 const urls = ['/', '/menu', '/plans', '/about', '/contact']
 
 self.addEventListener('install', (event) => {

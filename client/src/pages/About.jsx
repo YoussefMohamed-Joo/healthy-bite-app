@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Leaf, Sparkles, Shield, Heart, Loader2 } from 'lucide-react'
@@ -24,12 +25,24 @@ export default function About() {
   )
 
   return (
-    <section className="min-h-screen bg-white pt-[70px]">
-      <div className="bg-gradient-to-br from-brand/5 to-white">
-        <div className="max-w-[1320px] mx-auto px-6 py-16 md:py-20 text-center">
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-cairo text-3xl md:text-4xl font-extrabold text-zinc-900 mb-4">
-            حكاية Healthy<span className="text-brand">Bite</span>
-          </motion.h1>
+    <>
+      <Helmet>
+        <title>عن Helthy Bite — قصتنا</title>
+        <meta name="description" content="إحنا Helthy Bite، منصة توصيل وجبات صحية في مصر. بدأنا في ٢٠٢٢ بني سويف عشان نغير شكل الأكل الصحي." />
+        <meta property="og:title" content="عن Helthy Bite — قصتنا" />
+        <meta property="og:description" content="إحنا Helthy Bite، منصة توصيل وجبات صحية في مصر. بدأنا في ٢٠٢٢ بني سويف." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/about" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/about" />
+      </Helmet>
+      <section className="min-h-screen bg-white pt-[70px]">
+        <div className="bg-gradient-to-br from-brand/5 to-white">
+          <div className="max-w-[1320px] mx-auto px-6 py-16 md:py-20 text-center">
+            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-cairo text-3xl md:text-4xl font-extrabold text-zinc-900 mb-4">
+              حكاية Helthy <span className="text-brand">Bite</span>
+            </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }} className="text-zinc-500 max-w-2xl mx-auto text-base leading-relaxed">
             بدأنا في ٢٠٢٢ بحلم بسيط: نغير شكل الأكل الصحي في مصر. مش مجرد وجبات — أسلوب حياة.
           </motion.p>
@@ -41,7 +54,7 @@ export default function About() {
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <h2 className="font-cairo text-2xl font-extrabold text-zinc-900 mb-4">إيه اللي بنقدمه؟</h2>
             <div className="space-y-3 text-zinc-600 text-sm leading-relaxed">
-              <p>HealthyBite منصة توصيل وجبات صحية في مصر. بنوصل وجبات طازة، محسوبة السعرات، وطعمها جامد — لباب بيتك.</p>
+              <p>Helthy Bite منصة توصيل وجبات صحية في مصر. بنوصل وجبات طازة، محسوبة السعرات، وطعمها جامد — لباب بيتك.</p>
               <p>بنستخدم مكونات طبيعية من مزارع محلية، وكل وجبة بتتصمم بالتعاون مع أخصائي تغذية عشان تضمن إنك بتاخد احتياجك بالظبط.</p>
               <p>أكثر من ٥٠٠+ عميل سعيد، وبنوصل لكل مناطق بني سويف. ولسه بنكبر!</p>
             </div>
@@ -74,6 +87,7 @@ export default function About() {
           })}
         </div>
       </div>
-    </section>
+      </section>
+    </>
   )
 }

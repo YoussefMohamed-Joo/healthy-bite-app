@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { Trash2, Minus, Plus, ShoppingBag } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
@@ -9,21 +10,46 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <section className="min-h-screen bg-zinc-50 pt-[70px]">
-        <div className="max-w-[1320px] mx-auto px-6 py-20 text-center">
-          <ShoppingBag className="w-16 h-16 text-zinc-300 mx-auto mb-4" />
-          <h2 className="font-cairo text-2xl font-bold text-zinc-900 mb-2">العربة فاضية</h2>
-          <p className="text-zinc-500 mb-6">ضيف وجبات صحية من المينيو</p>
-          <Link to="/menu"><Button>شوف المينيو</Button></Link>
-        </div>
-      </section>
+      <>
+        <Helmet>
+          <title>عربة التسوق — Helthy Bite</title>
+          <meta name="description" content="راجع وجباتك الصحية في عربة التسوق قبل إتمام الطلب من Helthy Bite." />
+          <meta property="og:title" content="عربة التسوق — Helthy Bite" />
+          <meta property="og:description" content="راجع وجباتك الصحية في عربة التسوق قبل إتمام الطلب." />
+          <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+          <meta property="og:url" content="https://helthybite.vercel.app/cart" />
+          <meta property="og:type" content="website" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <link rel="canonical" href="https://helthybite.vercel.app/cart" />
+        </Helmet>
+        <section className="min-h-screen bg-zinc-50 pt-[70px]">
+          <div className="max-w-[1320px] mx-auto px-6 py-20 text-center">
+            <ShoppingBag className="w-16 h-16 text-zinc-300 mx-auto mb-4" />
+            <h2 className="font-cairo text-2xl font-bold text-zinc-900 mb-2">العربة فاضية</h2>
+            <p className="text-zinc-500 mb-6">ضيف وجبات صحية من المينيو</p>
+            <Link to="/menu"><Button>شوف المينيو</Button></Link>
+          </div>
+        </section>
+      </>
     )
   }
 
   return (
-    <section className="min-h-screen bg-zinc-50 pt-[70px]">
-      <div className="max-w-[1320px] mx-auto px-6 py-10">
-        <h1 className="font-cairo text-3xl font-bold text-zinc-900 mb-8">عربة التسوق ({count})</h1>
+    <>
+      <Helmet>
+        <title>عربة التسوق — Helthy Bite</title>
+        <meta name="description" content="راجع وجباتك الصحية في عربة التسوق قبل إتمام الطلب من Helthy Bite." />
+        <meta property="og:title" content="عربة التسوق — Helthy Bite" />
+        <meta property="og:description" content="راجع وجباتك الصحية في عربة التسوق قبل إتمام الطلب." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/cart" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/cart" />
+      </Helmet>
+      <section className="min-h-screen bg-zinc-50 pt-[70px]">
+        <div className="max-w-[1320px] mx-auto px-6 py-10">
+          <h1 className="font-cairo text-3xl font-bold text-zinc-900 mb-8">عربة التسوق ({count})</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
@@ -78,6 +104,7 @@ export default function Cart() {
           </div>
         </div>
       </div>
-    </section>
+      </section>
+    </>
   )
 }

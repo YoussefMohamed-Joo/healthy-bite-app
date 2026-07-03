@@ -20,9 +20,10 @@ function loadKey(keyPath, envVar) {
 const config = {
   env: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT, 10) || 5000,
-  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/healthybite',
+  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/helthybite',
   jwtSecret: process.env.JWT_SECRET || 'hb-jwt-secret-change-in-production',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  jwtLongExpiry: process.env.JWT_LONG_EXPIRY || '30d',
   jwtPrivateKey: loadKey('keys/private.pem', 'RSA_PRIVATE_KEY'),
   jwtPublicKey: loadKey('keys/public.pem', 'RSA_PUBLIC_KEY'),
   jwtAlgorithm: 'RS256',
@@ -39,6 +40,7 @@ const config = {
     url: process.env.REDIS_URL || '',
     enabled: !!process.env.REDIS_URL,
   },
+  clientUrl: process.env.CLIENT_URL || 'https://helthybite.vercel.app',
   cors: {
     origin: process.env.CORS_ORIGIN || '*',
   },

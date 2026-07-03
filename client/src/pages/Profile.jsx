@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { motion } from 'framer-motion'
@@ -5,6 +6,7 @@ import { User, Save, Loader2, Download, Trash2, Mail, Phone, Home, Lock, AlertCi
 import { Button } from '@/components/ui/button'
 import { checkUpdate } from '@/utils/appUpdate'
 import { dispatchUpdateFound } from '@/utils/updateEvent'
+import AddressManager from '@/components/AddressManager'
 
 const API = import.meta.env.VITE_API_URL || ''
 
@@ -70,16 +72,28 @@ export default function Profile() {
   }
 
   return (
-    <section className="min-h-screen bg-grey-light pt-[72px] pb-10">
-      <div className="max-w-[600px] mx-auto px-6 py-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-primary-light flex items-center justify-center">
-              <User className="w-8 h-8 text-primary" />
-            </div>
-            <div>
-              <h1 className="font-cairo text-2xl font-extrabold text-charcoal">الملف الشخصي</h1>
+    <>
+      <Helmet>
+        <title>الملف الشخصي — Helthy Bite</title>
+        <meta name="description" content="إدارة بياناتك الشخصية وتغيير كلمة المرور في Helthy Bite." />
+        <meta property="og:title" content="الملف الشخصي — Helthy Bite" />
+        <meta property="og:description" content="إدارة بياناتك الشخصية في Helthy Bite." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/profile" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/profile" />
+      </Helmet>
+      <section className="min-h-screen bg-grey-light pt-[72px] pb-10">
+        <div className="max-w-[600px] mx-auto px-6 py-10">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-primary-light flex items-center justify-center">
+                <User className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h1 className="font-cairo text-2xl font-extrabold text-charcoal">الملف الشخصي</h1>
               <p className="text-grey text-sm flex items-center gap-1.5 mt-0.5">
                 <Mail className="w-3.5 h-3.5" />
                 {user?.email}
@@ -217,6 +231,11 @@ export default function Profile() {
             </Button>
           </form>
 
+          {/* Addresses */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+            <AddressManager />
+          </div>
+
           {/* App Updates */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4 mt-6">
             <h3 className="font-cairo font-bold text-lg text-charcoal flex items-center gap-2">
@@ -339,6 +358,7 @@ export default function Profile() {
           )}
         </motion.div>
       </div>
-    </section>
+      </section>
+    </>
   )
 }

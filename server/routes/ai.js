@@ -24,7 +24,7 @@ router.post('/ask', strictLimiter, adminRequired, async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: 'أنت مساعد ذكي لموقع HealthyBite (أكل صحي). أجب باللغة العربية دائماً. كن مفيداً ومختصراً.',
+          content: 'أنت مساعد ذكي لموقع Helthy Bite (أكل صحي). أجب باللغة العربية دائماً. كن مفيداً ومختصراً.',
         },
         { role: 'user', content: message },
       ],

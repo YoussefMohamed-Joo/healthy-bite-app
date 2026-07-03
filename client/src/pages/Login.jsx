@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
@@ -9,6 +10,7 @@ export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
+  const [rememberMe, setRememberMe] = useState(true)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showWelcome, setShowWelcome] = useState(false)
@@ -20,7 +22,7 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      const data = await login(form.email, form.password)
+      const data = await login(form.email, form.password, rememberMe)
       setUserName(data.user?.name || '')
       setRedirectPath(data.user?.role === 'admin' ? '/admin' : '/')
       setShowWelcome(true)
@@ -33,6 +35,17 @@ export default function Login() {
 
   return (
     <>
+      <Helmet>
+        <title>تسجيل الدخول — Helthy Bite</title>
+        <meta name="description" content="سجل دخولك في Helthy Bite لمتابعة طلباتك والحصول على عروض حصرية." />
+        <meta property="og:title" content="تسجيل الدخول — Helthy Bite" />
+        <meta property="og:description" content="سجل دخولك في Helthy Bite لمتابعة طلباتك." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/login" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/login" />
+      </Helmet>
       <section className="min-h-screen bg-zinc-50 pt-[70px] flex items-center justify-center">
         <div className="w-full max-w-sm mx-auto px-4 py-6">
           <div className="text-center mb-4">
@@ -54,6 +67,21 @@ export default function Login() {
             <div>
               <label className="block text-xs font-medium text-zinc-700 mb-1">كلمة المرور</label>
               <input required type="password" value={form.password} onChange={e => setForm(p => ({ ...p, password: e.target.value }))} placeholder="••••••••" className="w-full px-3 py-2 rounded-lg border border-zinc-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand/30" />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={e => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-zinc-300 text-brand focus:ring-brand/30"
+                />
+                <span className="text-xs text-zinc-600">تذكرني</span>
+              </label>
+              <Link to="/forgot-password" className="text-xs text-brand font-semibold hover:underline">
+                نسيت كلمة المرور؟
+              </Link>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>

@@ -1,7 +1,7 @@
 🔐 فتح الويب — بيانات الدخول
 
 🌐 رابط الموقع:
-https://client-one-cyan-92.vercel.app
+https://helthybite.vercel.app
 
 📧 البريد الإلكتروني للتواصل:
 hello@healthybite.com

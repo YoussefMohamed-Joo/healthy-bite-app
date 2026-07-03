@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import App from './App'
 import antiInspect from './utils/antiInspect'
@@ -21,8 +22,10 @@ if (typeof window !== 'undefined' && typeof window.Capacitor?.isNativePlatform =
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </HelmetProvider>
   </StrictMode>,
 )

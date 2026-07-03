@@ -1,8 +1,22 @@
+import { Helmet } from 'react-helmet-async'
+
 export default function RefundPolicy() {
   return (
-    <section className="min-h-screen bg-zinc-50 pt-[70px]">
-      <div className="max-w-[700px] mx-auto px-6 py-12">
-        <h1 className="font-cairo text-3xl font-bold text-zinc-900 mb-2">سياسة الإلغاء والاسترجاع</h1>
+    <>
+      <Helmet>
+        <title>سياسة الإلغاء والاسترجاع — Helthy Bite</title>
+        <meta name="description" content="سياسة الإلغاء والاسترجاع لـ Helthy Bite — تعرف على شروط إلغاء الطلب واسترداد المبلغ." />
+        <meta property="og:title" content="سياسة الإلغاء والاسترجاع — Helthy Bite" />
+        <meta property="og:description" content="سياسة الإلغاء والاسترجاع لـ Helthy Bite." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/refund-policy" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/refund-policy" />
+      </Helmet>
+      <section className="min-h-screen bg-zinc-50 pt-[70px]">
+        <div className="max-w-[700px] mx-auto px-6 py-12">
+          <h1 className="font-cairo text-3xl font-bold text-zinc-900 mb-2">سياسة الإلغاء والاسترجاع</h1>
         <p className="text-zinc-500 text-sm mb-8">آخر تحديث: يوليو 2026</p>
 
         <div className="bg-white rounded-2xl border border-zinc-100 p-8 space-y-6 text-zinc-600 text-sm leading-relaxed">
@@ -46,6 +60,7 @@ export default function RefundPolicy() {
           </section>
         </div>
       </div>
-    </section>
+      </section>
+    </>
   )
 }

@@ -1,14 +1,16 @@
 import { Link, useLocation } from 'react-router-dom'
-import { ShoppingCart, Menu, X, Leaf, User, LogOut } from 'lucide-react'
+import { ShoppingCart, Menu, X, Leaf, User, LogOut, Moon, Sun } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
+import { useDarkMode } from '@/context/DarkModeContext'
 import { Button } from '@/components/ui/button'
+import NotificationBell from '@/components/NotificationBell'
 
 const links = [
   { to: '/', label: 'الرئيسية' },
   { to: '/plans', label: 'الخطط' },
-  { to: '/menu', label: 'المتجر' },
+  { to: '/menu', label: 'المنيو' },
   { to: '/about', label: 'من نحن' },
   { to: '/contact', label: 'تواصل معنا' },
 ]
@@ -17,6 +19,7 @@ export default function Navbar() {
   const { pathname } = useLocation()
   const { count } = useCart()
   const { user, logout } = useAuth()
+  const { dark, toggle } = useDarkMode()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [userMenu, setUserMenu] = useState(false)
@@ -40,7 +43,7 @@ export default function Navbar() {
             <Leaf className="w-5 h-5 text-white" />
           </div>
           <span className="text-charcoal font-bold text-xl tracking-tight">
-            Healthy<span className="text-primary">Bite</span>
+            Helthy <span className="text-primary">Bite</span>
           </span>
         </Link>
 
@@ -66,6 +69,18 @@ export default function Navbar() {
 
         {/* Left side: Actions */}
         <div className="flex items-center gap-3">
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggle}
+            className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer bg-none border-none"
+            aria-label="Toggle dark mode"
+          >
+            {dark ? <Sun className="w-[20px] h-[20px] text-charcoal" /> : <Moon className="w-[20px] h-[20px] text-charcoal" />}
+          </button>
+
+          {/* Notifications */}
+          {user && <NotificationBell />}
+
           {/* Cart */}
           <Link to="/cart" className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors no-underline">
             <ShoppingCart className="w-[22px] h-[22px] text-charcoal" />
@@ -157,7 +172,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div className="flex items-center gap-2">
             <Leaf className="w-5 h-5 text-primary" />
-            <span className="font-bold text-lg text-charcoal">HealthyBite</span>
+            <span className="font-bold text-lg text-charcoal">Helthy Bite</span>
           </div>
           <button className="p-1 cursor-pointer bg-none border-none" onClick={() => setOpen(false)}>
             <X className="w-5 h-5 text-charcoal" />

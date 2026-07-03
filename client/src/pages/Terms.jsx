@@ -1,14 +1,28 @@
+import { Helmet } from 'react-helmet-async'
+
 export default function Terms() {
   return (
-    <section className="min-h-screen bg-zinc-50 pt-[70px]">
-      <div className="max-w-[700px] mx-auto px-6 py-12">
-        <h1 className="font-cairo text-3xl font-bold text-zinc-900 mb-2">شروط الاستخدام</h1>
+    <>
+      <Helmet>
+        <title>شروط الاستخدام — Helthy Bite</title>
+        <meta name="description" content="شروط استخدام موقع Helthy Bite — منصة توصيل الوجبات الصحية في مصر." />
+        <meta property="og:title" content="شروط الاستخدام — Helthy Bite" />
+        <meta property="og:description" content="شروط استخدام موقع Helthy Bite." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/terms" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/terms" />
+      </Helmet>
+      <section className="min-h-screen bg-zinc-50 pt-[70px]">
+        <div className="max-w-[700px] mx-auto px-6 py-12">
+          <h1 className="font-cairo text-3xl font-bold text-zinc-900 mb-2">شروط الاستخدام</h1>
         <p className="text-zinc-500 text-sm mb-8">آخر تحديث: يوليو 2026</p>
 
         <div className="bg-white rounded-2xl border border-zinc-100 p-8 space-y-6 text-zinc-600 text-sm leading-relaxed">
           <section>
             <h2 className="font-cairo font-bold text-zinc-900 text-lg mb-3">١. قبول الشروط</h2>
-            <p>باستخدامك لموقع HealthyBite، فإنك توافق على هذه الشروط. إذا لم توافق، يرجى عدم استخدام الموقع.</p>
+            <p>باستخدامك لموقع Helthy Bite، فإنك توافق على هذه الشروط. إذا لم توافق، يرجى عدم استخدام الموقع.</p>
           </section>
 
           <section>
@@ -31,7 +45,7 @@ export default function Terms() {
 
           <section>
             <h2 className="font-cairo font-bold text-zinc-900 text-lg mb-3">٥. المسؤولية</h2>
-            <p>HealthyBite غير مسؤول عن أي أضرار غير مباشرة ناتجة عن استخدام الموقع أو المنتجات. أقصى مسؤولية لنا هي قيمة الطلب المدفوعة.</p>
+            <p>Helthy Bite غير مسؤول عن أي أضرار غير مباشرة ناتجة عن استخدام الموقع أو المنتجات. أقصى مسؤولية لنا هي قيمة الطلب المدفوعة.</p>
           </section>
 
           <section>
@@ -40,6 +54,7 @@ export default function Terms() {
           </section>
         </div>
       </div>
-    </section>
+      </section>
+    </>
   )
 }

@@ -1,7 +1,10 @@
 import { Routes, Route } from 'react-router-dom'
 import { CartProvider } from '@/context/CartContext'
 import { AuthProvider } from '@/context/AuthContext'
+import { DarkModeProvider } from '@/context/DarkModeContext'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import AdminRoute from '@/components/AdminRoute'
 import AdminLayout from '@/components/AdminLayout'
 import Home from '@/pages/Home'
@@ -17,6 +20,9 @@ import Contact from '@/pages/Contact'
 import Terms from '@/pages/Terms'
 import Privacy from '@/pages/Privacy'
 import RefundPolicy from '@/pages/RefundPolicy'
+import ForgotPassword from '@/pages/ForgotPassword'
+import ResetPassword from '@/pages/ResetPassword'
+import NotFound from '@/pages/NotFound'
 import AdminDashboard from '@/pages/admin/Dashboard'
 import AdminProducts from '@/pages/admin/Products'
 import AdminOrders from '@/pages/admin/Orders'
@@ -42,49 +48,59 @@ import UpdateOverlay from '@/components/UpdateOverlay'
 
 export default function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <Navbar />
-        <ChatWidget />
-        <Routes>
-          {/* Public */}
-          <Route path="/" element={<Home />} />
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/plans" element={<Plans />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/refund-policy" element={<RefundPolicy />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/my-orders" element={<MyOrders />} />
-          <Route path="/profile" element={<Profile />} />
+    <ErrorBoundary>
+      <AuthProvider>
+        <CartProvider>
+          <DarkModeProvider>
+            <Navbar />
+            <ChatWidget />
+            <Routes>
+              {/* Public */}
+              <Route path="/" element={<Home />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/plans" element={<Plans />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/refund-policy" element={<RefundPolicy />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Admin — protected by AdminRoute */}
-          <Route path="/admin" element={<AdminRoute><AdminLayout><AdminDashboard /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/products" element={<AdminRoute><AdminLayout><AdminProducts /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/orders" element={<AdminRoute><AdminLayout><AdminOrders /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/current-orders" element={<AdminRoute><AdminLayout><AdminCurrentOrders /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/customers" element={<AdminRoute><AdminLayout><AdminCustomers /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/customers/:id" element={<AdminRoute><AdminLayout><AdminCustomerDetail /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/downloads" element={<AdminRoute><AdminLayout><AdminAppDownloads /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/faq" element={<AdminRoute><AdminLayout><AdminFaq /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/settings" element={<AdminRoute><AdminLayout><AdminSiteSettings /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/payments" element={<AdminRoute><AdminLayout><AdminPaymentVerification /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/plans" element={<AdminRoute><AdminLayout><AdminPlans /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/testimonials" element={<AdminRoute><AdminLayout><AdminTestimonials /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/coupons" element={<AdminRoute><AdminLayout><AdminCoupons /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/chats" element={<AdminRoute><AdminLayout><AdminChats /></AdminLayout></AdminRoute>} />
-          <Route path="/admin/ai" element={<AdminRoute><AdminLayout><AdminAiAssistant /></AdminLayout></AdminRoute>} />
-        </Routes>
-        <OrderNotification />
-        <AppManager />
-        <UpdateOverlay />
-      </CartProvider>
-    </AuthProvider>
+              {/* Admin — protected by AdminRoute */}
+              <Route path="/admin" element={<AdminRoute><AdminLayout><AdminDashboard /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/products" element={<AdminRoute><AdminLayout><AdminProducts /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/orders" element={<AdminRoute><AdminLayout><AdminOrders /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/current-orders" element={<AdminRoute><AdminLayout><AdminCurrentOrders /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/customers" element={<AdminRoute><AdminLayout><AdminCustomers /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/customers/:id" element={<AdminRoute><AdminLayout><AdminCustomerDetail /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/downloads" element={<AdminRoute><AdminLayout><AdminAppDownloads /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/faq" element={<AdminRoute><AdminLayout><AdminFaq /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/settings" element={<AdminRoute><AdminLayout><AdminSiteSettings /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/payments" element={<AdminRoute><AdminLayout><AdminPaymentVerification /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/plans" element={<AdminRoute><AdminLayout><AdminPlans /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/testimonials" element={<AdminRoute><AdminLayout><AdminTestimonials /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/coupons" element={<AdminRoute><AdminLayout><AdminCoupons /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/chats" element={<AdminRoute><AdminLayout><AdminChats /></AdminLayout></AdminRoute>} />
+              <Route path="/admin/ai" element={<AdminRoute><AdminLayout><AdminAiAssistant /></AdminLayout></AdminRoute>} />
+
+              {/* 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Footer />
+            <OrderNotification />
+            <AppManager />
+            <UpdateOverlay />
+          </DarkModeProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }

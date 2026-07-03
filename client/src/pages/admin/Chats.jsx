@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from '@/utils/supabase'
 import { playMessageSound, requestNotificationPermission } from '@/utils/playMessageSound'
-import { MessageCircle, Send, CheckCircle2, RotateCcw, Loader2, Smartphone, Monitor } from 'lucide-react'
+import { MessageCircle, Send, CheckCircle2, RotateCcw, Loader2 } from 'lucide-react'
 
 const API = import.meta.env.VITE_API_URL || ''
 
@@ -12,86 +11,90 @@ export default function AdminChats() {
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [tab, setTab] = useState('active')
+  const [loading, setLoading] = useState(true)
   const bottomRef = useRef(null)
+  const activeConvRef = useRef(null)
 
   useEffect(() => { requestNotificationPermission() }, [])
 
   useEffect(() => {
     fetchConversations()
+    const id = setInterval(fetchConversations, 5000)
+    return () => clearInterval(id)
   }, [tab])
+
+  useEffect(() => {
+    if (!activeConv) return
+    activeConvRef.current = activeConv.id
+    const id = setInterval(async () => {
+      try {
+        const res = await fetch(`${API}/chat/${activeConvRef.current}/messages`, { credentials: 'include' })
+        const d = await res.json()
+        setMessages(prev => {
+          const newMsgs = d.data || []
+          if (newMsgs.length > prev.length) {
+            const added = newMsgs.filter(m => !prev.some(om => om.id === m.id))
+            if (added.some(m => m.senderRole === 'user')) {
+              playMessageSound()
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('💬 رسالة جديدة', {
+                  body: added[added.length - 1].content?.slice(0, 80),
+                  icon: '/favicon.ico',
+                })
+              }
+            }
+          }
+          return newMsgs
+        })
+      } catch { /* silent */ }
+    }, 3000)
+    return () => clearInterval(id)
+  }, [activeConv])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // Subscribe to ALL new messages for admin
-  useEffect(() => {
-    const channel = supabase
-      .channel('admin:messages')
-      .on('postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => {
-          const msg = payload.new
-          // If currently viewing this conversation, append
-          if (activeConv && msg.conversation_id === activeConv.id) {
-            setMessages(prev => {
-              if (prev.some(m => m.id === msg.id)) return prev
-              return [...prev, msg]
-            })
-          }
-          // Refresh conversation list
-          setConversations(prev => {
-            const existing = prev.find(c => c.id === msg.conversation_id)
-            if (existing) {
-              return prev.map(c =>
-                c.id === msg.conversation_id
-                  ? { ...c, lastMessage: msg, updated_at: msg.created_at }
-                  : c
-              ).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-            }
-            return prev
-          })
-          // Notify
-          if (msg.sender_role === 'user') {
-            playMessageSound()
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('💬 رسالة جديدة', {
-                body: msg.content?.slice(0, 80),
-                icon: '/favicon.ico',
-              })
-            }
-          }
-        }
-      )
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }, [activeConv])
-
   const fetchConversations = async () => {
-    const res = await fetch(`${API}/chat?status=${tab}`, { credentials: 'include' })
-    const d = await res.json()
-    setConversations(d.data || [])
+    try {
+      const res = await fetch(`${API}/chat?status=${tab}`, { credentials: 'include' })
+      const d = await res.json()
+      setConversations(d.data || [])
+    } catch { /* ignore */ }
+    setLoading(false)
   }
 
   const selectConversation = async (conv) => {
     setActiveConv(conv)
-    const res = await fetch(`${API}/chat/${conv.id}/messages`, { credentials: 'include' })
-    const d = await res.json()
-    setMessages(d.data || [])
+    try {
+      const res = await fetch(`${API}/chat/${conv.id}/messages`, { credentials: 'include' })
+      const d = await res.json()
+      setMessages(d.data || [])
+    } catch { /* ignore */ }
   }
 
   const sendMessage = async () => {
     if (!text.trim() || !activeConv || sending) return
     setSending(true)
+    const content = text.trim()
+    setText('')
+    // Optimistic update
+    setMessages(prev => [...prev, {
+      id: `temp-${Date.now()}`,
+      content,
+      senderRole: 'admin',
+      createdAt: new Date().toISOString(),
+    }])
     try {
       await fetch(`${API}/chat/${activeConv.id}/message`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: text.trim() }),
+        body: JSON.stringify({ content }),
       })
-      setText('')
+      const res = await fetch(`${API}/chat/${activeConv.id}/messages`, { credentials: 'include' })
+      const d = await res.json()
+      setMessages(d.data || [])
     } catch { /* ignore */ }
     setSending(false)
   }
@@ -125,7 +128,7 @@ export default function AdminChats() {
       <div className="w-72 shrink-0 bg-white rounded-2xl border border-zinc-100 flex flex-col overflow-hidden">
         <div className="p-4 border-b border-zinc-100">
           <h2 className="font-bold text-zinc-900 flex items-center gap-2">
-            <MessageCircle className="w-5 h-5 text-brand" />
+            <MessageCircle className="w-5 h-5 text-[#237C3C]" />
             المحادثات
           </h2>
           <div className="flex gap-1 mt-3 bg-zinc-100 rounded-xl p-1">
@@ -144,7 +147,11 @@ export default function AdminChats() {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto">
-          {conversations.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="w-5 h-5 animate-spin text-zinc-300" />
+            </div>
+          ) : conversations.length === 0 ? (
             <div className="flex items-center justify-center h-full text-zinc-400 text-sm p-4 text-center">
               لا توجد محادثات {tab === 'active' ? 'نشطة' : 'مغلقة'}
             </div>
@@ -153,23 +160,23 @@ export default function AdminChats() {
               <button
                 key={conv.id}
                 onClick={() => selectConversation(conv)}
-                className={`w-full text-right px-4 py-3 border-b border-zinc-50 hover:bg-zinc-50 transition-colors cursor-pointer ${activeConv?.id === conv.id ? 'bg-brand-light/30' : ''}`}
+                className={`w-full text-right px-4 py-3 border-b border-zinc-50 hover:bg-zinc-50 transition-colors cursor-pointer ${activeConv?.id === conv.id ? 'bg-[#E8F5E9]/30' : ''}`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-zinc-900 truncate">{conv.user_name || conv.user_email || conv.user_id?.slice(0, 8)}</span>
-                  <span className="text-[10px] text-zinc-400 shrink-0 mr-2">{formatTime(conv.updated_at)}</span>
+                  <span className="text-sm font-bold text-zinc-900 truncate">{conv.userName || conv.userEmail || conv.userId?.slice(0, 8)}</span>
+                  <span className="text-[10px] text-zinc-400 shrink-0 mr-2">{formatTime(conv.updatedAt)}</span>
                 </div>
                 <p className="text-xs text-zinc-500 truncate mt-1">
                   {conv.lastMessage ? (
-                    <>{conv.lastMessage.sender_role === 'admin' ? 'أنت: ' : ''}{conv.lastMessage.content}</>
+                    <>{conv.lastMessage.senderRole === 'admin' ? 'أنت: ' : ''}{conv.lastMessage.content}</>
                   ) : 'لا توجد رسائل'}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   {conv.status === 'resolved' && (
                     <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full">مغلقة</span>
                   )}
-                  {conv.user_email && (
-                    <span className="text-[10px] text-zinc-400">{conv.user_email}</span>
+                  {conv.userEmail && (
+                    <span className="text-[10px] text-zinc-400">{conv.userEmail}</span>
                   )}
                 </div>
               </button>
@@ -192,8 +199,8 @@ export default function AdminChats() {
             {/* Header */}
             <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between shrink-0">
               <div>
-                <p className="text-sm font-bold text-zinc-900">{activeConv.user_name || 'مستخدم'}</p>
-                <p className="text-xs text-zinc-500">{activeConv.user_email || ''}</p>
+                <p className="text-sm font-bold text-zinc-900">{activeConv.userName || 'مستخدم'}</p>
+                <p className="text-xs text-zinc-500">{activeConv.userEmail || ''}</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -216,15 +223,15 @@ export default function AdminChats() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 bg-zinc-50">
               {messages.map(msg => (
-                <div key={msg.id} className={`flex ${msg.sender_role === 'admin' ? 'justify-start' : 'justify-end'}`}>
+                <div key={msg.id} className={`flex ${msg.senderRole === 'admin' ? 'justify-start' : 'justify-end'}`}>
                   <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                    msg.sender_role === 'admin'
-                      ? 'bg-brand text-white rounded-br-sm'
+                    msg.senderRole === 'admin'
+                      ? 'bg-[#237C3C] text-white rounded-br-sm'
                       : 'bg-white text-zinc-800 border border-zinc-200 rounded-bl-sm'
                   }`}>
                     <p>{msg.content}</p>
-                    <p className={`text-[10px] mt-1 ${msg.sender_role === 'admin' ? 'text-white/60' : 'text-zinc-400'}`}>
-                      {formatTime(msg.created_at)}
+                    <p className={`text-[10px] mt-1 ${msg.senderRole === 'admin' ? 'text-white/60' : 'text-zinc-400'}`}>
+                      {formatTime(msg.createdAt)}
                     </p>
                   </div>
                 </div>
@@ -241,13 +248,13 @@ export default function AdminChats() {
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
                   placeholder="اكتب ردك..."
                   rows={1}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-zinc-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-zinc-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#237C3C]/30 focus:border-[#237C3C] transition-all"
                   style={{ minHeight: 40, maxHeight: 100 }}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!text.trim() || sending}
-                  className="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center hover:bg-brand-dark disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0 cursor-pointer"
+                  className="w-10 h-10 rounded-xl bg-[#237C3C] text-white flex items-center justify-center hover:bg-[#1A5E2E] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0 cursor-pointer"
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </button>

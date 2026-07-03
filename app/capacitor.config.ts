@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https',
     iosScheme: 'https',
-    hostname: 'client-one-cyan-92.vercel.app',
+    hostname: 'helthybite.vercel.app',
   },
   plugins: {
     SplashScreen: {

@@ -4,7 +4,7 @@ import { LogOut, Leaf } from 'lucide-react'
 import NewUserAlert from './NewUserAlert'
 
 const sidebarLinks = [
-  { section: 'HealthyBite' },
+  { section: 'Helthy Bite' },
   { path: '/admin', label: 'الرئيسية', exact: true },
   { path: '/admin/plans', label: 'الخطط' },
   { path: '/admin/products', label: 'المتجر' },

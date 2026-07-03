@@ -33,7 +33,7 @@ if (config.cloudinary.cloudName && config.cloudinary.apiKey) {
   storage = new CloudinaryStorage({
     cloudinary,
     params: {
-      folder: 'healthybite',
+      folder: 'helthybite',
       allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'avif'],
       transformation: [{ width: 800, height: 600, crop: 'fill', quality: 'auto' }],
     },

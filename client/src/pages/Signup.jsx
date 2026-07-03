@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -30,6 +31,7 @@ export default function Signup() {
   const { register: authRegister } = useAuth()
   const navigate = useNavigate()
   const [error, setError] = useState('')
+  const [rememberMe, setRememberMe] = useState(true)
   const [showWelcome, setShowWelcome] = useState(false)
   const [userName, setUserName] = useState('')
   const [showOtpModal, setShowOtpModal] = useState(false)
@@ -73,7 +75,7 @@ export default function Signup() {
       const json = await res.json()
       if (json.status === 'error') throw new Error(json.message)
       setShowOtpModal(false)
-      await authRegister(formData.name, formData.email, formData.password, formData.phone, formData.address)
+      await authRegister(formData.name, formData.email, formData.password, formData.phone, formData.address, rememberMe)
       setUserName(formData.name)
       setShowWelcome(true)
     } catch (err) {
@@ -85,6 +87,17 @@ export default function Signup() {
 
   return (
     <>
+      <Helmet>
+        <title>إنشاء حساب — Helthy Bite</title>
+        <meta name="description" content="أنشئ حساب جديد في Helthy Bite واطلب وجبات صحية أونلاين. اشترك عشان تتابع طلباتك وتحصل على عروض حصرية." />
+        <meta property="og:title" content="إنشاء حساب — Helthy Bite" />
+        <meta property="og:description" content="أنشئ حساب جديد في Helthy Bite واطلب وجبات صحية أونلاين." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/signup" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/signup" />
+      </Helmet>
       <section className="min-h-screen bg-grey-light pt-[72px] flex items-center justify-center py-10">
         <div className="w-full max-w-md mx-auto px-4">
           <div className="text-center mb-6">
@@ -152,6 +165,16 @@ export default function Signup() {
               <input type="password" {...register('confirmPassword')} placeholder="أعد كتابة كلمة المرور" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-charcoal placeholder:text-grey focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all bg-white" />
               {errors.confirmPassword && <p className="flex items-center gap-1 text-red-500 text-xs mt-1.5"><AlertCircle className="w-3 h-3" />{errors.confirmPassword.message}</p>}
             </div>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-zinc-300 text-brand focus:ring-brand/30"
+              />
+              <span className="text-sm text-zinc-600">تذكرني</span>
+            </label>
 
             <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
               {isSubmitting ? 'جاري إنشاء الحساب...' : 'إنشاء حساب'}

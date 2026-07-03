@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Package, RefreshCw, XCircle } from 'lucide-react'
@@ -86,21 +87,46 @@ export default function MyOrders() {
 
   if (orders.length === 0) {
     return (
-      <section className="min-h-screen bg-zinc-50 pt-[70px]">
-        <div className="max-w-[800px] mx-auto px-6 py-14 text-center">
-          <Package className="w-16 h-16 text-zinc-300 mx-auto mb-4" />
-          <h2 className="font-cairo text-2xl font-bold text-zinc-900 mb-2">لا توجد طلبات</h2>
-          <p className="text-zinc-500">لم تقم بطلب أي وجبات بعد</p>
-        </div>
-      </section>
+      <>
+        <Helmet>
+          <title>طلباتي — Helthy Bite</title>
+          <meta name="description" content="تابع حالة طلباتك السابقة والحالية من Helthy Bite." />
+          <meta property="og:title" content="طلباتي — Helthy Bite" />
+          <meta property="og:description" content="تابع حالة طلباتك من Helthy Bite." />
+          <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+          <meta property="og:url" content="https://helthybite.vercel.app/my-orders" />
+          <meta property="og:type" content="website" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <link rel="canonical" href="https://helthybite.vercel.app/my-orders" />
+        </Helmet>
+        <section className="min-h-screen bg-zinc-50 pt-[70px]">
+          <div className="max-w-[800px] mx-auto px-6 py-14 text-center">
+            <Package className="w-16 h-16 text-zinc-300 mx-auto mb-4" />
+            <h2 className="font-cairo text-2xl font-bold text-zinc-900 mb-2">لا توجد طلبات</h2>
+            <p className="text-zinc-500">لم تقم بطلب أي وجبات بعد</p>
+          </div>
+        </section>
+      </>
     )
   }
 
   return (
-    <section className="min-h-screen bg-zinc-50 pt-[70px]">
-      <div className="max-w-[800px] mx-auto px-6 py-10">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="font-cairo text-2xl font-bold text-zinc-900">طلباتي</h1>
+    <>
+      <Helmet>
+        <title>طلباتي — Helthy Bite</title>
+        <meta name="description" content="تابع حالة طلباتك السابقة والحالية من Helthy Bite." />
+        <meta property="og:title" content="طلباتي — Helthy Bite" />
+        <meta property="og:description" content="تابع حالة طلباتك من Helthy Bite." />
+        <meta property="og:image" content="https://helthybite.vercel.app/og-image.svg" />
+        <meta property="og:url" content="https://helthybite.vercel.app/my-orders" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://helthybite.vercel.app/my-orders" />
+      </Helmet>
+      <section className="min-h-screen bg-zinc-50 pt-[70px]">
+        <div className="max-w-[800px] mx-auto px-6 py-10">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="font-cairo text-2xl font-bold text-zinc-900">طلباتي</h1>
           <button
             onClick={handleRefresh}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-200 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
@@ -179,6 +205,7 @@ export default function MyOrders() {
           })}
         </div>
       </div>
-    </section>
+      </section>
+    </>
   )
 }

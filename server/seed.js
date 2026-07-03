@@ -6,7 +6,7 @@ import Testimonial from './models/Testimonial.js'
 import Faq from './models/Faq.js'
 import SiteSetting from './models/SiteSetting.js'
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/healthybite'
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/helthybite'
 
 const products = [
   { name: 'Power Bowl', nameAr: 'باور بول', price: 13.90, calories: 420, description: 'Quinoa, sweet potato, avocado, chickpea, tahini', descriptionAr: 'كينوا، بطاطا حلوة، أفوكادو، حمص، صلصة طحينة', category: 'main', rating: 4.8 },
@@ -37,7 +37,7 @@ const faqs = [
   { question: 'كم تكلفة توصيل الوجبات الصحية؟', answer: 'التوصيل مجاني للطلبات فوق ١٠٠ جنيه. للطلبات الأقل، التوصيل ٢٠ جنيه فقط.', order: 9 },
   { question: 'ما المناطق اللي بتغطوها لتوصيل الوجبات الصحية؟', answer: 'بني سويف، وسط المدينة، بياض العرب، إهناسيا، الفشن، الواسطى، ناصر، وكل القرى المجاورة.', order: 10 },
   { question: 'هل يمكنني طلب وجبات صحية لمكتبي في بني سويف؟', answer: 'أكيد — بنوصل لمكاتب وشركات في كل مناطق بني سويف. تقدر تعمل طلب منتظم لمكتبك كل يوم.', order: 11 },
-  { question: 'ليه أختار HealthyBite لتوصيل الطعام الصحي؟', answer: 'وجبات طازة يومياً، سعرات محسوبة بدقة، مكونات طبيعية، توصيل مجاني وسريع، وطعم جامد مش هتحس إنك على دايت.', order: 12 },
+  { question: 'ليه أختار Helthy Bite لتوصيل الطعام الصحي؟', answer: 'وجبات طازة يومياً، سعرات محسوبة بدقة، مكونات طبيعية، توصيل مجاني وسريع، وطعم جامد مش هتحس إنك على دايت.', order: 12 },
 ]
 
 const siteSettings = [
@@ -87,7 +87,7 @@ const deliverySeed = [
 ]
 
 const testimonials = [
-  { name: 'محمد علي', rating: 5, text: 'بصراحة أنا جربت كتير قبل كده، بس HealthyBite حاجة تانية. الأكل طازة والطعم جامد. نزلت ٨ كيلو في شهرين من غير حرمان!', avatar: 'https://i.pravatar.cc/100?img=11' },
+  { name: 'محمد علي', rating: 5, text: 'بصراحة أنا جربت كتير قبل كده، بس Helthy Bite حاجة تانية. الأكل طازة والطعم جامد. نزلت ٨ كيلو في شهرين من غير حرمان!', avatar: 'https://i.pravatar.cc/100?img=11' },
   { name: 'سارة أحمد', rating: 5, text: 'التوصيل بيجى في المعاد بالظبط، والتغليف حلو والوجبات مكتوب عليها السعرات. مثالية للي عايز يظبط أكله من غير تعب.', avatar: 'https://i.pravatar.cc/100?img=9' },
   { name: 'خالد يوسف', rating: 4, text: 'خطة التضخيم عندهم ممتازة. الوجبات كتيرة وسعراتها عالية وبروتين نظيف. جربت كتير بس دول الأفضل.', avatar: 'https://i.pravatar.cc/100?img=12' },
   { name: 'نورا محمد', rating: 5, text: 'أفضل حاجة إن فيه خيارات كتير وكل يوم تقدر تختار اللي يناسبك. خدمة العملاء محترمة وسريعة.', avatar: 'https://i.pravatar.cc/100?img=5' },

@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
     sessionId: { type: String, required: true },
     device: { type: String, default: '' },
     ip: { type: String, default: '' },
+    lastUsed: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now }
   }],
   registrationIp: { type: String, default: '' },
@@ -23,6 +24,8 @@ const userSchema = new mongoose.Schema({
   lastLoginIp: { type: String, default: '' },
   lastLoginDevice: { type: String, default: '' },
   devices: [{ type: String }],
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
 }, { timestamps: true })
 
 userSchema.pre('save', async function (next) {
