@@ -4,11 +4,6 @@ import { trackDownload } from '@/utils/tracking'
 
 const API = import.meta.env.VITE_API_URL || 'https://healthybite-server.vercel.app'
 
-function isMobile() {
-  if (typeof window === 'undefined') return false
-  return /android|iphone|ipad|ipod/i.test(navigator.userAgent)
-}
-
 export default function MobileDownload() {
   const [apkExists, setApkExists] = useState(null)
 
@@ -19,7 +14,7 @@ export default function MobileDownload() {
       .catch(() => setApkExists(false))
   }, [API])
 
-  if (isMobile()) return null
+  if (typeof window !== 'undefined' && window.Capacitor?.isNativePlatform) return null
 
   return (
     <section className="bg-gradient-to-br from-brand to-brand-dark py-16 md:py-20">

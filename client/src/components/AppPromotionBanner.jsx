@@ -38,6 +38,7 @@ export default function AppManager() {
   }, [email, device])
 
   if (dismissed) return null
+  if (typeof window !== 'undefined' && window.Capacitor?.isNativePlatform) return null
 
   const apkReady = buildStatus?.android
 
