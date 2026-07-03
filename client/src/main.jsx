@@ -15,7 +15,7 @@ initTracking()
 registerSW()
 
 // Initialize Capacitor mobile app if running natively
-if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.isNativePlatform) {
+if (typeof window !== 'undefined' && typeof window.Capacitor?.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) {
   setupMobileApp()
 }
 
