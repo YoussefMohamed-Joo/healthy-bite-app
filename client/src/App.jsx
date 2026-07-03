@@ -22,6 +22,8 @@ import AdminProducts from '@/pages/admin/Products'
 import AdminOrders from '@/pages/admin/Orders'
 import AdminCurrentOrders from '@/pages/admin/CurrentOrders'
 import AdminCustomers from '@/pages/admin/Customers'
+import AdminCustomerDetail from '@/pages/admin/CustomerDetail'
+import AdminAppDownloads from '@/pages/admin/AppDownloads'
 import AdminFaq from '@/pages/admin/Faq'
 import AdminSiteSettings from '@/pages/admin/SiteSettings'
 import AdminPaymentVerification from '@/pages/admin/PaymentVerification'
@@ -66,6 +68,8 @@ export default function App() {
           <Route path="/admin/orders" element={<AdminRoute><AdminLayout><AdminOrders /></AdminLayout></AdminRoute>} />
           <Route path="/admin/current-orders" element={<AdminRoute><AdminLayout><AdminCurrentOrders /></AdminLayout></AdminRoute>} />
           <Route path="/admin/customers" element={<AdminRoute><AdminLayout><AdminCustomers /></AdminLayout></AdminRoute>} />
+          <Route path="/admin/customers/:id" element={<AdminRoute><AdminLayout><AdminCustomerDetail /></AdminLayout></AdminRoute>} />
+          <Route path="/admin/downloads" element={<AdminRoute><AdminLayout><AdminAppDownloads /></AdminLayout></AdminRoute>} />
           <Route path="/admin/faq" element={<AdminRoute><AdminLayout><AdminFaq /></AdminLayout></AdminRoute>} />
           <Route path="/admin/settings" element={<AdminRoute><AdminLayout><AdminSiteSettings /></AdminLayout></AdminRoute>} />
           <Route path="/admin/payments" element={<AdminRoute><AdminLayout><AdminPaymentVerification /></AdminLayout></AdminRoute>} />

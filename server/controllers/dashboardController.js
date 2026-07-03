@@ -1,5 +1,6 @@
 import Order from '../models/Order.js'
 import User from '../models/User.js'
+import Download from '../models/Download.js'
 import catchAsync from '../utils/catchAsync.js'
 
 export const getRevenueChart = catchAsync(async (req, res) => {
@@ -53,14 +54,23 @@ export const getAnalytics = catchAsync(async (req, res) => {
   const now = new Date()
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const todayEnd = new Date(todayStart.getTime() + 86400000)
+  const weekStart = new Date(todayStart.getTime() - 6 * 86400000)
 
-  const [todayRevenue, pendingOrders, activeUsers] = await Promise.all([
+  const [todayRevenue, pendingOrders, activeUsers, downloadStats, recentDownloads] = await Promise.all([
     Order.aggregate([
       { $match: { status: 'delivered', createdAt: { $gte: todayStart, $lt: todayEnd } } },
       { $group: { _id: null, total: { $sum: '$total' } } },
     ]),
     Order.countDocuments({ status: 'pending' }),
     User.countDocuments({ role: 'client', active: true }),
+    Promise.all([
+      Download.countDocuments(),
+      Download.countDocuments({ device: 'android' }),
+      Download.countDocuments({ device: 'ios' }),
+      Download.countDocuments({ createdAt: { $gte: todayStart } }),
+      Download.countDocuments({ createdAt: { $gte: weekStart } }),
+    ]),
+    Download.find().sort('-createdAt').limit(20).lean(),
   ])
 
   res.json({
@@ -69,6 +79,14 @@ export const getAnalytics = catchAsync(async (req, res) => {
       todayRevenue: todayRevenue[0]?.total || 0,
       pendingOrders,
       activeUsers,
+      downloadStats: {
+        total: downloadStats[0],
+        android: downloadStats[1],
+        ios: downloadStats[2],
+        today: downloadStats[3],
+        thisWeek: downloadStats[4],
+      },
+      recentDownloads,
     },
   })
 })

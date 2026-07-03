@@ -15,6 +15,7 @@ const sidebarLinks = [
   { path: '/admin/payments', label: 'التحقق من الدفع' },
   { path: '/admin/coupons', label: 'كوبونات' },
   { path: '/admin/chats', label: 'المحادثات' },
+  { path: '/admin/downloads', label: 'التنزيلات' },
   { path: '/admin/ai', label: '🤖 AI' },
   { path: '/admin/testimonials', label: 'الآراء' },
   { path: '/admin/faq', label: 'الأسئلة' },

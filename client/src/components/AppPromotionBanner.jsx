@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { X, Download, Smartphone, QrCode, Bell, Apple } from 'lucide-react'
 import { getDeviceType } from '@/utils/device'
+import { trackDownload } from '@/utils/tracking'
 import IOSInstallGuide from './IOSInstallGuide'
 
 const APK_PATH = 'https://github.com/YoussefMohamed-Joo/healthy-bite-app/releases/latest/download/HealthyBite-Android.apk'
@@ -55,6 +56,7 @@ export default function AppManager() {
               <a
                 href={APK_PATH}
                 download
+                onClick={() => trackDownload('android')}
                 className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-brand text-white text-sm font-bold hover:bg-brand-dark transition-colors no-underline cursor-pointer"
               >
                 <Download className="w-4 h-4" />
@@ -139,6 +141,7 @@ export default function AppManager() {
               <a
                 href={APK_PATH}
                 download
+                onClick={() => trackDownload('android')}
                 className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-brand text-white text-sm font-bold hover:bg-brand-dark transition-colors no-underline cursor-pointer"
               >
                 <Download className="w-4 h-4" />

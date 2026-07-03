@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { ShoppingBag, Eye, X, Search } from 'lucide-react'
+import { ShoppingBag, Eye, X, Search, Smartphone, Activity } from 'lucide-react'
 import { io } from 'socket.io-client'
 
 const API = import.meta.env.VITE_API_URL || ''
@@ -93,6 +94,7 @@ export default function AdminCustomers() {
               <th className="text-right p-4 font-semibold">البريد</th>
               <th className="text-right p-4 font-semibold">الهاتف</th>
               <th className="text-center p-4 font-semibold">الطلبات</th>
+              <th className="text-center p-4 font-semibold">تنزيلات</th>
               <th className="text-left p-4 font-semibold">الإجمالي</th>
               <th className="text-right p-4 font-semibold">تاريخ التسجيل</th>
               <th className="text-left p-4 font-semibold"></th>
@@ -108,19 +110,31 @@ export default function AdminCustomers() {
                 <td className="p-4 text-zinc-600">{c.email}</td>
                 <td className="p-4 text-zinc-600" dir="ltr">{c.phone || '—'}</td>
                 <td className="p-4 text-center"><span className="bg-brand-light text-brand text-xs font-semibold px-3 py-1 rounded-full">{c.orderCount}</span></td>
+                <td className="p-4 text-center">
+                  {c.downloadCount > 0 ? (
+                    <span className="bg-amber-50 text-amber-600 text-xs font-semibold px-3 py-1 rounded-full flex items-center justify-center gap-1">
+                      <Smartphone className="w-3 h-3" /> {c.downloadCount}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-zinc-300">—</span>
+                  )}
+                </td>
                 <td className="p-4 text-zinc-900 font-medium">{c.totalSpent.toFixed(2)} ج.م</td>
                 <td className="p-4 text-zinc-400 text-xs">{formatTime(c.createdAt)}</td>
                 <td className="p-4 text-left flex gap-1 justify-end">
                   <Button size="sm" variant="ghost" onClick={() => viewOrders(c)}>
                     <ShoppingBag className="w-3.5 h-3.5" />
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => viewActivities(c)}>
+                  <Link to={`/admin/customers/${c._id}`} className="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-500 hover:text-brand no-underline">
                     <Eye className="w-3.5 h-3.5" />
+                  </Link>
+                  <Button size="sm" variant="ghost" onClick={() => viewActivities(c)}>
+                    <Activity className="w-3.5 h-3.5" />
                   </Button>
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-zinc-400">لا يوجد عملاء</td></tr>}
+            {filtered.length === 0 && <tr><td colSpan={8} className="p-8 text-center text-zinc-400">لا يوجد عملاء</td></tr>}
           </tbody>
         </table>
       </div>

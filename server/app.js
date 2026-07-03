@@ -32,6 +32,7 @@ import chatRoutes from './routes/chat.js'
 import aiRoutes from './routes/ai.js'
 import mobileRoutes from './routes/mobile.js'
 import downloadRoutes from './routes/download.js'
+import trackingRoutes from './routes/tracking.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -109,6 +110,7 @@ app.use('/chat', chatRoutes)
 app.use('/ai', aiRoutes)
 app.use('/mobile', mobileRoutes)
 app.use('/api/download', downloadRoutes)
+app.use('/track', trackingRoutes)
 
 app.use((_, res) => res.status(404).json({ status: 'error', message: 'Route not found' }))
 if (process.env.SENTRY_DSN) app.use(Sentry.Handlers.errorHandler())

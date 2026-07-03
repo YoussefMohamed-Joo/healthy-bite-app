@@ -6,8 +6,10 @@ import App from './App'
 import antiInspect from './utils/antiInspect'
 import { setupMobileApp } from './utils/mobile'
 import { registerSW } from './utils/pwa'
+import { initTracking } from './utils/tracking'
 
 antiInspect()
+initTracking()
 
 // Register PWA service worker
 registerSW()

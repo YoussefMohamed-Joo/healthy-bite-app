@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Apple, Download, Smartphone, Loader2 } from 'lucide-react'
+import { trackDownload } from '@/utils/tracking'
 
 export default function MobileDownload() {
   const [apkExists, setApkExists] = useState(null)
@@ -38,6 +39,7 @@ export default function MobileDownload() {
                   href="https://github.com/YoussefMohamed-Joo/healthy-bite-app/releases/latest/download/HealthyBite-Android.apk"
                   className="flex items-center gap-3 px-8 py-3.5 rounded-xl bg-white text-brand hover:shadow-lg hover:-translate-y-0.5 text-sm font-bold transition-all no-underline"
                   download
+                  onClick={() => trackDownload('android')}
                 >
                   <Download className="w-5 h-5" />
                   <div className="text-right">

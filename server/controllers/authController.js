@@ -38,7 +38,7 @@ export const loginValidation = [
 
 export const register = catchAsync(async (req, res) => {
   const io = req.app.get('io')
-  const result = await authService.registerUser(req.body, io)
+  const result = await authService.registerUser({ ...req.body, req }, io)
   setTokenCookie(res, result.token)
   res.status(201).json({ status: 'success', user: result.user })
 })

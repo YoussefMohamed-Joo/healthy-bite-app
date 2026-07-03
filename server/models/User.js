@@ -14,8 +14,15 @@ const userSchema = new mongoose.Schema({
   sessions: [{
     sessionId: { type: String, required: true },
     device: { type: String, default: '' },
+    ip: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
   }],
+  registrationIp: { type: String, default: '' },
+  registrationDevice: { type: String, default: '' },
+  registrationReferrer: { type: String, default: '' },
+  lastLoginIp: { type: String, default: '' },
+  lastLoginDevice: { type: String, default: '' },
+  devices: [{ type: String }],
 }, { timestamps: true })
 
 userSchema.pre('save', async function (next) {

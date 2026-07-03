@@ -6,19 +6,35 @@ import { logActivity } from './activityService.js'
 
 const ADMIN_EMAIL = 'admin@healthybite.com'
 
-export async function registerUser({ name, email, password, phone, address }, io) {
+export async function registerUser({ name, email, password, phone, address, req }, io) {
   const existing = await User.findOne({ email })
   if (existing) throw new ApiError(400, 'Email already registered')
 
+  const ip = req?.headers?.['x-forwarded-for']?.split(',')[0]?.trim()
+    || req?.headers?.['x-real-ip']
+    || req?.socket?.remoteAddress
+    || ''
+  const userAgent = req?.headers?.['user-agent'] || ''
+  const referrer = req?.headers?.['referer'] || ''
+
   const role = email === ADMIN_EMAIL ? 'admin' : 'client'
   const sessionId = crypto.randomUUID()
-  const user = await User.create({ name, email, password, phone, address, role })
+
+  const deviceType = /android/i.test(userAgent) ? 'android' : /iphone|ipad|ipod/i.test(userAgent) ? 'ios' : 'desktop'
+
+  const user = await User.create({
+    name, email, password, phone, address, role,
+    registrationIp: ip,
+    registrationDevice: deviceType,
+    registrationReferrer: referrer,
+    devices: [deviceType].filter(Boolean),
+  })
   if (!user.sessions) user.sessions = []
-  user.sessions.push({ sessionId, device: '' })
+  user.sessions.push({ sessionId, device: userAgent, ip })
   await user.save()
   const token = generateToken(user._id, sessionId)
 
-  await logActivity(user._id, 'register', 'تم إنشاء الحساب')
+  await logActivity(user._id, 'register', `تم إنشاء الحساب من ${deviceType} [${ip}]`)
 
   if (io) {
     io.to('admin-room').emit('new_user_registered', {
@@ -41,25 +57,34 @@ export async function loginUser({ email, password, req }) {
   if (!match) throw new ApiError(400, 'Invalid email or password')
   if (!user.active) throw new ApiError(403, 'Account deactivated')
 
-  // Auto-promote admin email
+  const ip = req?.headers?.['x-forwarded-for']?.split(',')[0]?.trim()
+    || req?.headers?.['x-real-ip']
+    || req?.socket?.remoteAddress
+    || ''
+  const userAgent = req?.headers?.['user-agent'] || ''
+  const deviceType = /android/i.test(userAgent) ? 'android' : /iphone|ipad|ipod/i.test(userAgent) ? 'ios' : 'desktop'
+
   if (email === ADMIN_EMAIL && user.role !== 'admin') {
     user.role = 'admin'
     await user.save()
   }
 
   const sessionId = crypto.randomUUID()
-  const device = req?.headers?.['user-agent'] || ''
 
   if (!user.sessions) user.sessions = []
   if (user.sessions.length >= 2) {
     user.sessions = []
   }
-  user.sessions.push({ sessionId, device })
+  user.sessions.push({ sessionId, device: userAgent, ip })
+  user.lastLoginIp = ip
+  user.lastLoginDevice = deviceType
+  if (!user.devices) user.devices = []
+  if (!user.devices.includes(deviceType)) user.devices.push(deviceType)
   await user.save()
 
   const token = generateToken(user._id, sessionId)
 
-  await logActivity(user._id, 'login', `تم تسجيل الدخول من ${device}`)
+  await logActivity(user._id, 'login', `تم تسجيل الدخول من ${deviceType} [${ip}]`)
 
   return { token, user: { ...user.toJSON(), password: undefined } }
 }
