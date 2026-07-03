@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
-import { X, Download, Smartphone, QrCode, Bell, Apple } from 'lucide-react'
+import { X, Download, Smartphone, QrCode, Bell } from 'lucide-react'
 import { getDeviceType } from '@/utils/device'
 import { trackDownload } from '@/utils/tracking'
-import IOSInstallGuide from './IOSInstallGuide'
 
 const API = import.meta.env.VITE_API_URL || 'https://healthybite-server.vercel.app'
 const APK_PATH = `${API}/api/download/android`
@@ -12,7 +11,6 @@ export default function AppManager() {
   const [device, setDevice] = useState('desktop')
   const [dismissed, setDismissed] = useState(false)
   const [showQR, setShowQR] = useState(false)
-  const [showIOSGuide, setShowIOSGuide] = useState(false)
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -91,34 +89,8 @@ export default function AppManager() {
     )
   }
 
-  // iOS — PWA install guide
-  if (device === 'ios') {
-    return (
-      <>
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-zinc-200 shadow-2xl">
-          <div className="max-w-[1320px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <Apple className="w-5 h-5 text-zinc-800 shrink-0" />
-              <span className="text-sm font-bold text-zinc-900 truncate">ثبّت التطبيق</span>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => setShowIOSGuide(true)}
-                className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-zinc-800 text-white text-sm font-bold hover:bg-zinc-700 transition-colors cursor-pointer"
-              >
-                <Download className="w-4 h-4" />
-                كيفية التثبيت
-              </button>
-              <button onClick={() => setDismissed(true)} className="p-2 rounded-lg hover:bg-zinc-100 cursor-pointer">
-                <X className="w-4 h-4 text-zinc-400" />
-              </button>
-            </div>
-          </div>
-        </div>
-        {showIOSGuide && <IOSInstallGuide />}
-      </>
-    )
-  }
+  // iOS — no app available
+  if (device === 'ios') return null
 
   // Desktop — QR + direct download
   return (

@@ -16,6 +16,24 @@ router.get('/build-status', async (req, res) => {
   }
 })
 
+router.get('/version', async (_req, res) => {
+  try {
+    const response = await fetch('https://api.github.com/repos/YoussefMohamed-Joo/healthy-bite-app/releases/latest')
+    if (!response.ok) return res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '' } })
+    const data = await response.json()
+    res.json({
+      status: 'success',
+      data: {
+        version: data.tag_name?.replace('v', '') || '1.0.0',
+        apkUrl: `https://github.com/YoussefMohamed-Joo/healthy-bite-app/releases/download/${data.tag_name}/HealthyBite-Android.apk`,
+        releaseNotes: data.body || '',
+      },
+    })
+  } catch {
+    res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '' } })
+  }
+})
+
 router.post('/waitlist', async (req, res) => {
   const { email, device } = req.body
   if (!email?.trim()) throw new ApiError(400, 'Email is required')

@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Apple, Download, Smartphone, Loader2 } from 'lucide-react'
+import { Download, Smartphone, Loader2 } from 'lucide-react'
 import { trackDownload } from '@/utils/tracking'
 
 const API = import.meta.env.VITE_API_URL || 'https://healthybite-server.vercel.app'
+
+function isMobile() {
+  if (typeof window === 'undefined') return false
+  return /android|iphone|ipad|ipod/i.test(navigator.userAgent)
+}
 
 export default function MobileDownload() {
   const [apkExists, setApkExists] = useState(null)
@@ -13,6 +18,8 @@ export default function MobileDownload() {
       .then(d => setApkExists(d?.android))
       .catch(() => setApkExists(false))
   }, [API])
+
+  if (isMobile()) return null
 
   return (
     <section className="bg-gradient-to-br from-brand to-brand-dark py-16 md:py-20">
@@ -34,46 +41,28 @@ export default function MobileDownload() {
               <Loader2 className="w-5 h-5 animate-spin" />
               جاري التحميل...
             </div>
-          ) : (
-            <>
-              {apkExists ? (
-                <a
-                  href={`${API}/api/download/android`}
-                  className="flex items-center gap-3 px-8 py-3.5 rounded-xl bg-white text-brand hover:shadow-lg hover:-translate-y-0.5 text-sm font-bold transition-all no-underline"
-                  onClick={() => trackDownload('android')}
-                >
-                  <Download className="w-5 h-5" />
-                  <div className="text-right">
-                    <div className="text-[10px] opacity-60 font-normal">تحميل للـ</div>
-                    <div>Android APK</div>
-                  </div>
-                </a>
-              ) : (
-                <div className="flex items-center gap-3 px-8 py-3.5 rounded-xl bg-white/90 text-brand/60 text-sm font-bold">
-                  <Download className="w-5 h-5" />
-                  <div className="text-right">
-                    <div className="text-[10px] opacity-60 font-normal">النسخة</div>
-                    <div>Android (قريباً)</div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center gap-3 px-8 py-3.5 rounded-xl bg-white/60 text-brand/40 text-sm font-bold cursor-not-allowed">
-                <Apple className="w-5 h-5" />
-                <div className="text-right">
-                  <div className="text-[10px] opacity-60 font-normal">النسخة</div>
-                  <div>iOS (قريباً)</div>
-                </div>
+          ) : apkExists ? (
+            <a
+              href={`${API}/api/download/android`}
+              className="flex items-center gap-3 px-8 py-3.5 rounded-xl bg-white text-brand hover:shadow-lg hover:-translate-y-0.5 text-sm font-bold transition-all no-underline"
+              onClick={() => trackDownload('android')}
+            >
+              <Download className="w-5 h-5" />
+              <div className="text-right">
+                <div className="text-[10px] opacity-60 font-normal">تحميل للـ</div>
+                <div>Android APK</div>
               </div>
-            </>
+            </a>
+          ) : (
+            <div className="flex items-center gap-3 px-8 py-3.5 rounded-xl bg-white/90 text-brand/60 text-sm font-bold">
+              <Download className="w-5 h-5" />
+              <div className="text-right">
+                <div className="text-[10px] opacity-60 font-normal">النسخة</div>
+                <div>Android (قريباً)</div>
+              </div>
+            </div>
           )}
         </div>
-
-        {apkExists === false && (
-          <p className="text-white/60 text-xs mt-6">
-            نسخة الأندرويد قيد التجهيز. هتكون متاحة أول ما تعمل push ع GitHub.
-          </p>
-        )}
       </div>
     </section>
   )
