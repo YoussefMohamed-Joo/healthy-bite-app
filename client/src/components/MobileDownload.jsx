@@ -14,7 +14,7 @@ export default function MobileDownload() {
       .catch(() => setApkExists(false))
   }, [API])
 
-  if (typeof window !== 'undefined' && window.Capacitor?.isNativePlatform) return null
+  if (typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.()) return null
 
   return (
     <section className="bg-gradient-to-br from-brand to-brand-dark py-16 md:py-20">
