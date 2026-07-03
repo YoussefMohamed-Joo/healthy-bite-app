@@ -1,0 +1,6 @@
+{
+  "version": "11",
+  "apkUrl": "https://healthybite-server.vercel.app/api/download/android",
+  "releaseNotes": "- تحسينات في الأداء\n- إصلاح مشاكل التحميل\n- دعم التثبيت المباشر",
+  "forceUpdate": false
+}

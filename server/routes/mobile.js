@@ -19,18 +19,21 @@ router.get('/build-status', async (req, res) => {
 router.get('/version', async (_req, res) => {
   try {
     const response = await fetch('https://api.github.com/repos/YoussefMohamed-Joo/healthy-bite-app/releases/latest')
-    if (!response.ok) return res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '' } })
+    if (!response.ok) return res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false } })
     const data = await response.json()
+    const version = data.tag_name?.replace('v', '') || '1.0.0'
+    const major = parseInt(version.split('.')[0]) || parseInt(version)
     res.json({
       status: 'success',
       data: {
-        version: data.tag_name?.replace('v', '') || '1.0.0',
-        apkUrl: `https://github.com/YoussefMohamed-Joo/healthy-bite-app/releases/download/${data.tag_name}/HealthyBite-Android.apk`,
+        version,
+        apkUrl: `${req.protocol}://${req.get('host')}/api/download/android`,
         releaseNotes: data.body || '',
+        forceUpdate: major >= 10,
       },
     })
   } catch {
-    res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '' } })
+    res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false } })
   }
 })
 

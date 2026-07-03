@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { motion } from 'framer-motion'
-import { User, Save, Loader2, Download, Trash2, Mail, Phone, Home, Lock, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { User, Save, Loader2, Download, Trash2, Mail, Phone, Home, Lock, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { checkUpdate } from '@/utils/appUpdate'
+import { dispatchUpdateFound } from '@/utils/updateEvent'
 
 const API = import.meta.env.VITE_API_URL || ''
 
@@ -211,6 +213,29 @@ export default function Profile() {
               تغيير كلمة المرور
             </Button>
           </form>
+
+          {/* App Updates */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4 mt-6">
+            <h3 className="font-cairo font-bold text-lg text-charcoal flex items-center gap-2">
+              <Download className="w-5 h-5 text-primary" />
+              تحديثات التطبيق
+            </h3>
+            <p className="text-grey text-sm">تحقق من وجود إصدار جديد للتطبيق.</p>
+            <Button
+              variant="outline"
+              className="w-full border-gray-200 hover:border-primary hover:text-primary"
+              onClick={async () => {
+                const update = await checkUpdate()
+                if (update) {
+                  dispatchUpdateFound(update, update.forceUpdate)
+                } else {
+                  setMsg({ text: '🎉 التطبيق محدث لأحدث إصدار', type: 'success' })
+                }
+              }}
+            >
+              <RefreshCw className="w-4 h-4" /> التحقق من وجود تحديثات
+            </Button>
+          </div>
 
           {/* Data & Privacy */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4 mt-6">

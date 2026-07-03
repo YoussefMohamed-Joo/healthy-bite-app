@@ -37,6 +37,7 @@ import Profile from '@/pages/Profile'
 import OrderNotification from '@/components/OrderNotification'
 import ChatWidget from '@/components/ChatWidget'
 import AppManager from '@/components/AppPromotionBanner'
+import UpdateOverlay from '@/components/UpdateOverlay'
 
 
 export default function App() {
@@ -82,6 +83,7 @@ export default function App() {
         </Routes>
         <OrderNotification />
         <AppManager />
+        <UpdateOverlay />
       </CartProvider>
     </AuthProvider>
   )
