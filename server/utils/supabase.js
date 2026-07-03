@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+let _supabase = null
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.warn('Supabase not configured — chat features will fail')
+export function getSupabase() {
+  if (!_supabase) {
+    const supabaseUrl = process.env.SUPABASE_URL
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!supabaseUrl || !supabaseServiceKey) return null
+    _supabase = createClient(supabaseUrl, supabaseServiceKey)
+  }
+  return _supabase
 }
-
-export const supabase = createClient(supabaseUrl || '', supabaseServiceKey || '')
