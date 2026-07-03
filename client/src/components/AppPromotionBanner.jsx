@@ -27,7 +27,7 @@ export default function AppManager() {
     if (!email.trim()) return
     setSubmitting(true)
     try {
-      await fetch('/mobile/waitlist', {
+      await fetch(`${API}/mobile/waitlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), device }),

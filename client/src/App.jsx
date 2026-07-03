@@ -36,6 +36,7 @@ import MyOrders from '@/pages/MyOrders'
 import Profile from '@/pages/Profile'
 import OrderNotification from '@/components/OrderNotification'
 import ChatWidget from '@/components/ChatWidget'
+import AppManager from '@/components/AppPromotionBanner'
 
 
 export default function App() {
@@ -80,6 +81,7 @@ export default function App() {
           <Route path="/admin/ai" element={<AdminRoute><AdminLayout><AdminAiAssistant /></AdminLayout></AdminRoute>} />
         </Routes>
         <OrderNotification />
+        <AppManager />
       </CartProvider>
     </AuthProvider>
   )
