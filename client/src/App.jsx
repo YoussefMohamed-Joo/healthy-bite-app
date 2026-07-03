@@ -36,7 +36,7 @@ import MyOrders from '@/pages/MyOrders'
 import Profile from '@/pages/Profile'
 import OrderNotification from '@/components/OrderNotification'
 import ChatWidget from '@/components/ChatWidget'
-import MobileDownload from '@/components/MobileDownload'
+
 
 export default function App() {
   return (
