@@ -28,22 +28,23 @@ router.get('/version', async (req, res) => {
       headers: { 'Accept': 'application/vnd.github+json', 'User-Agent': 'HealthyBite-Server/1.0' },
     })
     if (!response.ok) {
-      return res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false }, debug: { status: response.status, statusText: response.statusText } })
+      return res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false } })
     }
     const data = await response.json()
     const version = String(data.tag_name || '1.0.0').replace('v', '')
     const major = parseInt(version, 10) || 0
+    const host = req.get('host') || 'healthybite-server.vercel.app'
     res.json({
       status: 'success',
       data: {
         version,
-        apkUrl: `${req.protocol}://${req.get('host')}/api/download/android`,
+        apkUrl: `https://${host}/api/download/android`,
         releaseNotes: data.body || '',
         forceUpdate: major >= 10,
       },
     })
   } catch (err) {
-    res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false }, debug: { error: err.message, stack: err.stack?.split('\n')[0] } })
+    res.json({ status: 'success', data: { version: '1.0.0', apkUrl: '', releaseNotes: '', forceUpdate: false } })
   }
 })
 
