@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react'
 import { Apple, Download, Smartphone, Loader2 } from 'lucide-react'
 import { trackDownload } from '@/utils/tracking'
 
+const API = import.meta.env.VITE_API_URL || 'https://healthybite-server.vercel.app'
+
 export default function MobileDownload() {
   const [apkExists, setApkExists] = useState(null)
 
   useEffect(() => {
-    fetch('/mobile/build-status')
+    fetch(`${API}/mobile/build-status`)
       .then(r => r.json())
       .then(d => setApkExists(d?.android))
       .catch(() => setApkExists(false))
-  }, [])
+  }, [API])
 
   return (
     <section className="bg-gradient-to-br from-brand to-brand-dark py-16 md:py-20">
@@ -36,9 +38,8 @@ export default function MobileDownload() {
             <>
               {apkExists ? (
                 <a
-                  href="https://github.com/YoussefMohamed-Joo/healthy-bite-app/releases/latest/download/HealthyBite-Android.apk"
+                  href={`${API}/api/download/android`}
                   className="flex items-center gap-3 px-8 py-3.5 rounded-xl bg-white text-brand hover:shadow-lg hover:-translate-y-0.5 text-sm font-bold transition-all no-underline"
-                  download
                   onClick={() => trackDownload('android')}
                 >
                   <Download className="w-5 h-5" />

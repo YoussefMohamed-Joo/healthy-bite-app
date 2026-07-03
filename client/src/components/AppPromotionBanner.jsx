@@ -4,7 +4,8 @@ import { getDeviceType } from '@/utils/device'
 import { trackDownload } from '@/utils/tracking'
 import IOSInstallGuide from './IOSInstallGuide'
 
-const APK_PATH = 'https://github.com/YoussefMohamed-Joo/healthy-bite-app/releases/latest/download/HealthyBite-Android.apk'
+const API = import.meta.env.VITE_API_URL || 'https://healthybite-server.vercel.app'
+const APK_PATH = `${API}/api/download/android`
 
 export default function AppManager() {
   const [buildStatus, setBuildStatus] = useState(null)
@@ -18,11 +19,11 @@ export default function AppManager() {
 
   useEffect(() => {
     setDevice(getDeviceType())
-    fetch(`/mobile/build-status`)
+    fetch(`${API}/mobile/build-status`)
       .then(r => r.json())
       .then(d => setBuildStatus(d))
       .catch(() => setBuildStatus({ android: false, ios: false }))
-  }, [])
+  }, [API])
 
   const handleNotify = useCallback(async () => {
     if (!email.trim()) return
@@ -55,7 +56,6 @@ export default function AppManager() {
             {apkReady ? (
               <a
                 href={APK_PATH}
-                download
                 onClick={() => trackDownload('android')}
                 className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-brand text-white text-sm font-bold hover:bg-brand-dark transition-colors no-underline cursor-pointer"
               >
@@ -140,7 +140,6 @@ export default function AppManager() {
             {apkReady ? (
               <a
                 href={APK_PATH}
-                download
                 onClick={() => trackDownload('android')}
                 className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-brand text-white text-sm font-bold hover:bg-brand-dark transition-colors no-underline cursor-pointer"
               >
