@@ -3,7 +3,7 @@ import { X, Download, Smartphone, QrCode, Bell, Apple } from 'lucide-react'
 import { getDeviceType } from '@/utils/device'
 import IOSInstallGuide from './IOSInstallGuide'
 
-const APK_PATH = '/downloads/HealthyBite-Android.apk'
+const APK_PATH = 'https://github.com/YoussefMohamed-Joo/healthy-bite-app/releases/latest/download/HealthyBite-Android.apk'
 
 export default function AppManager() {
   const [buildStatus, setBuildStatus] = useState(null)

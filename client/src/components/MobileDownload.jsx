@@ -35,7 +35,7 @@ export default function MobileDownload() {
             <>
               {apkExists ? (
                 <a
-                  href="/downloads/HealthyBite-Android.apk"
+                  href="https://github.com/YoussefMohamed-Joo/healthy-bite-app/releases/latest/download/HealthyBite-Android.apk"
                   className="flex items-center gap-3 px-8 py-3.5 rounded-xl bg-white text-brand hover:shadow-lg hover:-translate-y-0.5 text-sm font-bold transition-all no-underline"
                   download
                 >
