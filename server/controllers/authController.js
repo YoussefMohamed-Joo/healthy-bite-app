@@ -76,7 +76,7 @@ export const logout = catchAsync(async (req, res) => {
 })
 
 export const deleteAccount = catchAsync(async (req, res) => {
-  const result = await authService.deleteAccount(req.userId, req.query.permanent === 'true')
+  const result = await authService.deleteAccount(req.userId)
   res.clearCookie('token', { path: '/' })
   res.json({ status: 'success', ...result })
 })

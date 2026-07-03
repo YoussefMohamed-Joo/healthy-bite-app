@@ -51,11 +51,12 @@ export async function registerUser({ name, email, password, phone, address, req 
 
 export async function loginUser({ email, password, req }) {
   const user = await User.findOne({ email }).select('+password')
-  if (!user) throw new ApiError(400, 'Invalid email or password')
+  if (!user || !user.active || user.email?.startsWith('deleted_')) {
+    throw new ApiError(400, 'Invalid email or password')
+  }
 
   const match = await user.comparePassword(password)
   if (!match) throw new ApiError(400, 'Invalid email or password')
-  if (!user.active) throw new ApiError(403, 'Account deactivated')
 
   const ip = req?.headers?.['x-forwarded-for']?.split(',')[0]?.trim()
     || req?.headers?.['x-real-ip']
@@ -126,23 +127,19 @@ export async function logoutUser(userId, sessionId) {
   return { message: 'Logged out' }
 }
 
-export async function deleteAccount(userId, permanent = false) {
+export async function deleteAccount(userId) {
   const user = await User.findById(userId)
   if (!user) throw new ApiError(404, 'User not found')
   if (user.role === 'admin') throw new ApiError(403, 'Admin accounts cannot be deleted')
 
-  if (permanent) {
-    await Order.updateMany({ user: userId }, { user: null, email: '' })
-    await User.findByIdAndDelete(userId)
-    await logActivity(userId, 'account_permanently_deleted', 'تم حذف الحساب نهائياً')
-    return { message: 'Account permanently deleted' }
-  }
-
+  const timestamp = Date.now()
+  user.email = `deleted_${timestamp}_${user.email}`
   user.active = false
   user.sessions = []
   await user.save()
-  await logActivity(userId, 'account_deactivated', 'تم إلغاء تنشيط الحساب')
-  return { message: 'Account deactivated. To permanently delete, use ?permanent=true' }
+
+  await logActivity(userId, 'account_deleted', `تم حذف الحساب — البريد الأصلي: ${user.email.replace(`deleted_${timestamp}_`, '')}`)
+  return { message: 'Account deleted' }
 }
 
 export async function exportUserData(userId) {

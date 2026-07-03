@@ -15,6 +15,9 @@ export default function Profile() {
   const [saving, setSaving] = useState(false)
   const [changingPassword, setChangingPassword] = useState(false)
   const [msg, setMsg] = useState({ text: '', type: '' })
+  const [deleteConfirm, setDeleteConfirm] = useState('idle')
+  const [deleteInput, setDeleteInput] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -260,17 +263,80 @@ export default function Profile() {
               }}>
                 <Download className="w-4 h-4" /> تصدير بياناتي
               </Button>
-              <Button variant="outline" className="flex-1 text-red-500 border-red-200 hover:bg-red-50" onClick={async () => {
-                if (!confirm('هل أنت متأكد؟ هذا سيحذف حسابك وكل بياناتك نهائياً!')) return
-                try {
-                  const res = await fetch(`${API}/auth/account?permanent=true`, { method: 'DELETE', credentials: 'include' })
-                  if (res.ok) { logout(); window.location.href = '/' }
-                } catch { setMsg({ text: 'حدث خطأ', type: 'error' }) }
-              }}>
+              <Button variant="outline" className="flex-1 text-red-500 border-red-200 hover:bg-red-50" onClick={() => setDeleteConfirm('first')}>
                 <Trash2 className="w-4 h-4" /> حذف الحساب نهائياً
               </Button>
             </div>
           </div>
+
+          {/* Delete confirmation modals */}
+          {deleteConfirm === 'first' && (
+            <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center" onClick={() => { setDeleteConfirm('idle'); setDeleteInput('') }}>
+              <div className="bg-white rounded-2xl w-[90%] max-w-sm mx-auto p-6 text-center" onClick={e => e.stopPropagation()}>
+                <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
+                  <AlertCircle className="w-7 h-7 text-red-500" />
+                </div>
+                <h3 className="text-lg font-bold text-zinc-900 mb-2">هل أنت متأكد من حذف الحساب؟</h3>
+                <p className="text-sm text-zinc-500 mb-6">سيتم حذف كل بياناتك وطلباتك السابقة. هذا الإجراء غير قابل للتراجع.</p>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => { setDeleteConfirm('second'); setDeleteInput('') }}
+                    className="w-full py-3 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors cursor-pointer"
+                  >
+                    نعم، متأكد
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirm('idle')}
+                    className="w-full py-3 rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors cursor-pointer"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {deleteConfirm === 'second' && (
+            <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center" onClick={() => { setDeleteConfirm('idle'); setDeleteInput('') }}>
+              <div className="bg-white rounded-2xl w-[90%] max-w-sm mx-auto p-6 text-center" onClick={e => e.stopPropagation()}>
+                <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
+                  <Trash2 className="w-7 h-7 text-red-500" />
+                </div>
+                <h3 className="text-lg font-bold text-zinc-900 mb-2">تأكيد الحذف النهائي</h3>
+                <p className="text-sm text-zinc-500 mb-4">هذا الإجراء نهائي ولا يمكن التراجع عنه. اكتب <strong>DELETE</strong> للتأكيد.</p>
+                <input
+                  autoFocus
+                  value={deleteInput}
+                  onChange={e => setDeleteInput(e.target.value)}
+                  placeholder="اكتب DELETE"
+                  className="w-full px-4 py-3 rounded-xl border border-red-200 text-sm text-center font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all mb-4"
+                />
+                <div className="flex flex-col gap-2">
+                  <button
+                    disabled={deleteInput !== 'DELETE' || deleting}
+                    onClick={async () => {
+                      setDeleting(true)
+                      try {
+                        const res = await fetch(`${API}/auth/account`, { method: 'DELETE', credentials: 'include' })
+                        if (res.ok) { logout(); window.location.href = '/' }
+                        else { const d = await res.json(); setMsg({ text: d.message || 'حدث خطأ', type: 'error' }); setDeleteConfirm('idle') }
+                      } catch { setMsg({ text: 'حدث خطأ في الاتصال', type: 'error' }); setDeleteConfirm('idle') }
+                      setDeleting(false)
+                    }}
+                    className="w-full py-3 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  >
+                    {deleting ? 'جارٍ الحذف...' : 'تأكيد الحذف'}
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirm('idle')}
+                    className="w-full py-3 rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors cursor-pointer"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </section>

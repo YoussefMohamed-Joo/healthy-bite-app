@@ -7,7 +7,7 @@ const API = import.meta.env.VITE_API_URL || ''
 const actionAr = {
   register: 'إنشاء الحساب', login: 'تسجيل دخول', order_placed: 'طلب جديد',
   order_cancelled: 'إلغاء طلب', profile_updated: 'تحديث البيانات',
-  account_deactivated: 'إلغاء تنشيط الحساب', account_deleted: 'حذف الحساب',
+  account_deleted: 'حذف الحساب',
 }
 
 const statusAr = {
