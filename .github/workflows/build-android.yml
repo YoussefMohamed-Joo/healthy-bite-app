@@ -44,16 +44,26 @@ jobs:
         working-directory: app
         run: npx cap sync
 
-      - name: Build APK (debug)
+      - name: Generate release keystore
+        run: |
+          keytool -genkey -v -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass healthybite -keypass healthybite \
+            -dname "CN=HealthyBite, OU=Development, O=HealthyBite, L=Cairo, ST=Cairo, C=EG"
+
+      - name: Build APK (release)
         working-directory: app/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug
+          export ANDROID_KEYSTORE_PATH=$GITHUB_WORKSPACE/release.keystore
+          export ANDROID_KEYSTORE_PASSWORD=healthybite
+          export ANDROID_KEY_ALIAS=release
+          export ANDROID_KEY_PASSWORD=healthybite
+          ./gradlew assembleRelease
 
       - name: Rename and copy APK to web public dir
         run: |
           mkdir -p client/public/downloads
-          cp app/android/app/build/outputs/apk/debug/app-debug.apk client/public/downloads/HealthyBite-Android.apk
+          cp app/android/app/build/outputs/apk/release/app-release.apk client/public/downloads/HealthyBite-Android.apk
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
